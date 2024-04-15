@@ -74,6 +74,12 @@ class timedate:
     def getDayOfYear(self, recDate):
         date = datetime.datetime(self.getYear(recDate), self.getMonth(recDate), self.getDay(recDate))
         return date.strftime('%j')
+    
+    def formatTime(self, recTime):
+        minutes = self.getMinutes(recTime)
+        seconds = self.getSeconds(recTime)
+        text = str(minutes).zfill(2) + ":" + str(seconds).zfill(2)
+        return text
          
 def createDatelist(dataset):
 
@@ -515,52 +521,63 @@ def selectPredictedSampleTimes(predicted, sampleTime):
                 
     return predictedSampleTime
 
-def analyseAbundanceSampleTime(trap, labelName, countsTh, percentageTh, resultFileName):
+def analyseAbundanceSampleTime(trap, labelNames, countsTh, percentageTh, resultFileName):
     
     td = timedate()    
-    figure = plt.figure(figsize=(20,20))
-    figure.tight_layout(pad=1.0)
-
     dateList, dayOfYear, selDataset2 = loadTrackFiles(trap, countsTh, percentageTh)
     predicted = loadSimulatedSnapFiles(trap)
-        
-    selDataset = selDataset2.loc[selDataset2['class'] == labelName]
-    abundance = countAbundance(selDataset, dateList)
-    
-    idxFig = 1
-    for sampleTime in [10, 30, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1500, 2000, 3000]:
-        
-        if "ax" in locals():
-            ax = figure.add_subplot(5, 3, idxFig, sharex = ax, sharey = ax) 
-        else:
-            ax = figure.add_subplot(5, 3, idxFig) 
-        
-        predictedSampleTime = selectPredictedSampleTimes(predicted, sampleTime)
-        abundanceTL = countSnapAbundance(predictedSampleTime, dateList, labelName)
-        correlation, _ = pearsonr(abundance, abundanceTL)
-        correlation = np.round(correlation * 10000)/10000
-        print(trap, labelName, len(selDataset), len(predictedSampleTime), sampleTime, correlation)
+    labelCorrelations = {}
+    for labelName in labelNames:    
+        figure = plt.figure(figsize=(15,15))
+        figure.tight_layout(pad=1.0)
 
-        labelText = labelName + ' (track)'
-        ax.plot(dayOfYear, abundance, label=labelText, color="green")
-        labelText = labelName + ' (TL)'
-        ax.plot(dayOfYear, abundanceTL, label=labelText, color="black")
+        selDataset = selDataset2.loc[selDataset2['class'] == labelName]
+        abundance = countAbundance(selDataset, dateList)
         
-        #title += "  " + td.strMonthDay(dateList[0]) + '-' + td.strMonthDay((dateList[-1])) + r"  $\rho$=" + str(correlation)
-        title = trap + "  (" + str(sampleTime) + r")  $\rho$=" + str(correlation)
-        ax.set_title(title)
-        if idxFig == 15:
-            ax.legend()  
-        ax.set_yscale('log')
-        if idxFig in [13, 14, 15]: 
-            ax.set_xlabel('Day of Year')
-        if idxFig in [1, 4, 7, 10, 13]:
-            ax.set_ylabel('Observations')
-        
-        idxFig += 1
+        idxFig = 1
+        sampleTimesCorrelation = []
+        #for sampleTime in [10, 30, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1500, 2000, 3000]:
+        for sampleTime in [10, 30, 100, 200, 500, 1000, 1500, 2000, 3000]:
+            
+            if "ax" in locals():
+                ax = figure.add_subplot(3, 3, idxFig, sharex = ax, sharey = ax) # 5, 3
+            else:
+                ax = figure.add_subplot(3, 3, idxFig) 
+            
+            predictedSampleTime = selectPredictedSampleTimes(predicted, sampleTime)
+            abundanceTL = countSnapAbundance(predictedSampleTime, dateList, labelName)
+            correlation, _ = pearsonr(abundance, abundanceTL)
+            correlation = np.round(correlation * 10000)/10000
+            print(trap, labelName, len(selDataset), len(predictedSampleTime), sampleTime, correlation)
+            sampleTimesCorrelation.append([sampleTime, correlation])
     
-    plt.savefig("./results/" + resultFileName)
-    plt.show() 
+            labelText = labelName + ' (track)'
+            ax.plot(dayOfYear, abundance, label=labelText, color="green")
+            labelText = labelName + ' (TL)'
+            ax.plot(dayOfYear, abundanceTL, label=labelText, color="black")
+            
+            #title += "  " + td.strMonthDay(dateList[0]) + '-' + td.strMonthDay((dateList[-1])) + r"  $\rho$=" + str(correlation)
+            title = "  TL=" + td.formatTime(sampleTime) + r" $\rho$=" + str(correlation)
+            ax.set_title(title)
+            if idxFig == 9: #15
+                ax.legend()  
+            ax.set_yscale('log')
+            if idxFig in [7, 8, 9]: #[13, 14, 15]: 
+                ax.set_xlabel('Day of Year')
+            if idxFig in [1, 4, 7, 10, 13]:
+                ax.set_ylabel('Observations')
+            
+            idxFig += 1
+        
+        subtitle = trap + " " + labelName
+        plt.suptitle(subtitle)
+        plt.tight_layout(pad=1.0)
+        plt.savefig(resultFileName + "_" + labelName + ".png")
+        plt.show() 
+        
+        labelCorrelations[labelName] = sampleTimesCorrelation
+        
+    return labelCorrelations
 
     # %% Insect plots
 if __name__ == '__main__':
@@ -569,9 +586,15 @@ if __name__ == '__main__':
     percentageTh = 50  
     plt.rcParams.update({'font.size': 12})
     
-    trap = "OH2"
-    analyseAbundanceSampleTime(trap, "Lepidoptera Macros", countsTh, percentageTh, trap + "_SampleTime.png")
-
+    # %% tíme-lapse sample times vs. motion tracks
+    traps = ['OH2'] #, 'LV2', 'SS2']
+    for trap in traps:
+        resultFileName = "./results/sampletimes/" + trap 
+        trapCorrelations = analyseAbundanceSampleTime(trap, labelNamesPlot, countsTh, percentageTh, resultFileName)
+        print(trap, trapCorrelations)
+        dstNpyfile = resultFileName+".npy"
+        np.save(dstNpyfile, trapCorrelations, allow_pickle=True) 
+    
     plt.rcParams.update({'font.size': 14})
     
     # %% Abundance plots
