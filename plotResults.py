@@ -169,20 +169,6 @@ def plotTimeHistograms(traps, trackPath, countsTh, percentageTh, labelNames, res
         
         dateList, dayOfYear, selDataset2 = loadTrackFiles(trap, countsTh, percentageTh)
         
-        # trackFiles = trackPath + trap + '/'  
-        # dataframes = []
-        # for fileName in sorted(os.listdir(trackFiles)):
-        #     if "TR.csv" in fileName:
-        #         #print(trap, trackFiles + fileName)
-        #         #data_df = pd.read_json(trackFiles + fileName)
-        #         data_df = pd.read_csv(trackFiles + fileName)
-        #         dataframes.append(data_df)                
-        # dataset = pd.concat(dataframes)
-        # print(trap, len(dataset))
-        # dateList, dayOfYear = createDatelist(dataset)
-        # selDataset1 = dataset.loc[dataset['percentage'] > percentageTh]
-        # selDataset2 = selDataset1.loc[selDataset1['counts'] >= countsTh]
-        
         if "ax" in locals():
             ax = figure.add_subplot(2, 2, idxFig, sharex = ax, sharey = ax) 
         else:
@@ -203,12 +189,12 @@ def plotTimeHistograms(traps, trackPath, countsTh, percentageTh, labelNames, res
             colorIdx += 1  
             
             #https://ipython-books.github.io/75-fitting-a-probability-distribution-to-data-with-the-maximum-likelihood-method/
-            meanDuration = np.mean(durations)
-            population_rate = 1/meanDuration
-            xs = np.arange(0, 1500, 1500/150)
-            ys = expon.pdf(xs, scale=1./population_rate)
-            zs = ys*100000
-            ax.plot(xs, zs, label='Estimate')
+            # meanDuration = np.mean(durations)
+            # population_rate = 1/meanDuration
+            # xs = np.arange(0, 1500, 1500/150)
+            # ys = expon.pdf(xs, scale=1./population_rate)
+            # zs = ys*100000
+            # ax.plot(xs, zs, label='Estimate')
             
             # sample_size = 100            
             # get_sample = lambda n: np.random.exponential(population_rate, n)
@@ -243,27 +229,13 @@ def plotSnapAbundance(traps, trackPath, csvPath, countsTh, percentageTh, labelNa
     
     figure = plt.figure(figsize=(12,12))
     figure.tight_layout(pad=1.0)
-    # conf = readconfig(config_filename)
-    # predict = Predictions(conf)
-    
+
     idxFig = 1
     for trap in traps:
         trackFiles = trackPath + trap + '/'
         
         dateList, dayOfYear, selDataset2 = loadTrackFiles(trap, countsTh, percentageTh)
-        
-        # dataframes = []
-        # for fileName in sorted(os.listdir(trackFiles)):
-        #     if "TR.csv" in fileName:
-        #         #print(trap, trackFiles + fileName)
-        #         #data_df = pd.read_json(trackFiles + fileName)
-        #         data_df = pd.read_csv(trackFiles + fileName)
-        #         dataframes.append(data_df)
-        # dataset = pd.concat(dataframes)
-        # print(trap, len(dataset))
-        # dateList, dayOfYear = createDatelist(dataset)
-        # selDataset1 = dataset.loc[dataset['percentage'] > percentageTh]
-        # selDataset2 = selDataset1.loc[selDataset1['counts'] >= countsTh]
+
         
         if "ax" in locals():
             ax = figure.add_subplot(2, 2, idxFig, sharex = ax, sharey = ax) 
@@ -271,9 +243,6 @@ def plotSnapAbundance(traps, trackPath, csvPath, countsTh, percentageTh, labelNa
             ax = figure.add_subplot(2, 2, idxFig) 
 
         predicted = loadSnapFiles(trap)
-        # trackSnapFile = csvPath + "snap" + trap + ".csv"
-        # threshold=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-        # predicted = predict.load_predictions(trackSnapFile, filterTime=0, threshold=threshold)               
 
         title = trap
         labels = ""
@@ -324,20 +293,6 @@ def plotAbundance(traps, trackPath, countsTh, percentageTh, labelNames, resultFi
         
         dateList, dayOfYear, selDataset2 = loadTrackFiles(trap, countsTh, percentageTh)
         
-        # trackFiles = trackPath + trap + '/'
-        # dataframes = []
-        # for fileName in sorted(os.listdir(trackFiles)):
-        #     if "TR.csv" in fileName:
-        #         #print(trap, trackFiles + fileName)
-        #         #data_df = pd.read_json(trackFiles + fileName)
-        #         data_df = pd.read_csv(trackFiles + fileName)
-        #         dataframes.append(data_df)           
-        # dataset = pd.concat(dataframes)
-        # print(trap, len(dataset))
-        # dateList, dayOfYear = createDatelist(dataset)
-        # selDataset1 = dataset.loc[dataset['percentage'] > percentageTh]
-        # selDataset2 = selDataset1.loc[selDataset1['counts'] >= countsTh]
-        
         if "ax" in locals():
             ax = figure.add_subplot(2, 2, idxFig, sharex = ax, sharey = ax) 
         else:
@@ -382,31 +337,12 @@ def plotAbundanceAllClasses(trap, countsTh, percentageTh, resultFileName, useSna
     trackFiles = trackPath + trap + '/'
     
     dateList, dayOfYear, selDataset2 = loadTrackFiles(trap, countsTh, percentageTh)
-        
-    # dataframes = []
-    # for fileName in sorted(os.listdir(trackFiles)):
-    #     if "TR.csv" in fileName:
-    #         #print(trap, trackFiles + fileName)
-    #         #data_df = pd.read_json(trackFiles + fileName)
-    #         data_df = pd.read_csv(trackFiles + fileName)
-    #         dataframes.append(data_df)        
-    # dataset = pd.concat(dataframes)
-    # print(trap, len(dataset))
-    # dateList, dayOfYear = createDatelist(dataset)
-    # selDataset1 = dataset.loc[dataset['percentage'] > percentageTh]
-    # selDataset2 = selDataset1.loc[selDataset1['counts'] >= countsTh]
-    
+  
     td = timedate()
     subtitle = trap + " (" + td.strMonthDay(dateList[0]) + '-' + td.strMonthDay((dateList[-1])) + ")"
  
     if useSnapImages:    
         predicted = loadSnapFiles(trap)
-        
-        # conf = readconfig(config_filename)
-        # predict = Predictions(conf)
-        # trackSnapFile = csvPath + "snap" + trap + ".csv"
-        # threshold=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-        # predicted = predict.load_predictions(trackSnapFile, filterTime=0, threshold=threshold)
                           
     idxFig = 1
     for labelName in labelNamesPlot:
@@ -600,16 +536,16 @@ if __name__ == '__main__':
     #testSelectPredictions("OH1")
     
     # %% Abundance plots
-    plotAbundanceSelectedClasses(countsTh, percentageTh)
+    #plotAbundanceSelectedClasses(countsTh, percentageTh)
     
     traps = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3', 'SS4']
-    for trap in traps:
-        plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundance/" + trap +"_Abundance.png")
-    for trap in traps:
-        plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundanceSnap/" + trap +"_Abundance.png", useSnapImages=True)
+    #for trap in traps:
+    #    plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundance/" + trap +"_Abundance.png")
+    #for trap in traps:
+    #    plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundanceSnap/" + trap +"_Abundance.png", useSnapImages=True)
     
     # %% Tracs vs. snap plots
-    plotTracksVsSnap(countsTh, percentageTh)
+    #plotTracksVsSnap(countsTh, percentageTh)
     
     # %% Time histogram plots
     traps = ['OH1', 'OH2', 'OH3', 'OH4']
