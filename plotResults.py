@@ -74,8 +74,7 @@ class timedate:
     def getDayOfYear(self, recDate):
         date = datetime.datetime(self.getYear(recDate), self.getMonth(recDate), self.getDay(recDate))
         return date.strftime('%j')
-        
-    
+         
 def createDatelist(dataset):
 
     td = timedate()
@@ -95,8 +94,7 @@ def createDatelist(dataset):
             dayOfYears.append(int(dayOfYear))
 
     return dates, dayOfYears
-
-    
+   
 def countAbundance(dataset, dates):
 
     abundance = np.zeros(len(dates)).tolist()
@@ -202,9 +200,7 @@ def plotTimeHistograms(traps, trackPath, countsTh, percentageTh, labelNames, res
             # plt.hist(sample, density=True, label='sample')            
             # plt.legend()
             # plt.show()
-
-      
-            
+          
         title += " (" + td.strMonthDay(dateList[0]) + '-' + td.strMonthDay((dateList[-1])) + ")"
         ax.set_title(title)
         ax.set_xlim(0, 1200)
@@ -222,7 +218,6 @@ def plotTimeHistograms(traps, trackPath, countsTh, percentageTh, labelNames, res
     plt.savefig("./results/" + resultFileName)
     plt.show() 
 
-
 def plotSnapAbundance(traps, trackPath, csvPath, countsTh, percentageTh, labelNames, resultFileName, colorOffset=0):
     
     td = timedate()
@@ -235,7 +230,6 @@ def plotSnapAbundance(traps, trackPath, csvPath, countsTh, percentageTh, labelNa
         trackFiles = trackPath + trap + '/'
         
         dateList, dayOfYear, selDataset2 = loadTrackFiles(trap, countsTh, percentageTh)
-
         
         if "ax" in locals():
             ax = figure.add_subplot(2, 2, idxFig, sharex = ax, sharey = ax) 
@@ -289,8 +283,7 @@ def plotAbundance(traps, trackPath, countsTh, percentageTh, labelNames, resultFi
 
     idxFig = 1
     for trap in traps:
-        
-        
+            
         dateList, dayOfYear, selDataset2 = loadTrackFiles(trap, countsTh, percentageTh)
         
         if "ax" in locals():
@@ -406,8 +399,7 @@ def plotAbundanceAllClasses(trap, countsTh, percentageTh, resultFileName, useSna
     plt.tight_layout(pad=1.0)
     plt.savefig("./results/" + resultFileName)
     plt.show() 
-
-    
+ 
 def plotAbundanceSelectedClasses(countsTh, percentageTh):
 
     labelNames =  ["Lepidoptera Macros", "Lepidoptera Micros"]
@@ -433,7 +425,7 @@ def plotAbundanceSelectedClasses(countsTh, percentageTh):
     plotAbundance(traps, trackPath, countsTh, percentageTh, labelNames, "SS_Other.png")
     traps = ['LV1', 'LV2', 'LV3', 'LV4']
     plotAbundance(traps, trackPath, countsTh, percentageTh, labelNames, "LV_Other.png")    
-    
+     
 def plotTracksVsSnap(countsTh, percentageTh):
 
     traps = ['SS1', 'SS2', 'SS3', 'SS4']
@@ -472,7 +464,6 @@ def plotTracksVsSnap(countsTh, percentageTh):
     labelNames =  ["Trichoptera"]
     plotSnapAbundance(traps, trackPath,  csvPath, countsTh, percentageTh, labelNames, "LV_Trichoptera_Snap.png", colorOffset=2)   
     
-
 def plotTimeHistogramsSelectedTrap(traps, trapscountsTh, percentageTh, name):
 
     traps = ['OH1', 'OH2', 'OH3', 'OH4']
@@ -488,27 +479,10 @@ def plotTimeHistogramsSelectedTrap(traps, trapscountsTh, percentageTh, name):
     #traps = ['SS1', 'SS2', 'SS3', 'SS4']
     plotTimeHistograms(traps, trackPath, 2, 50, labelNames, "SS_Vespidae_TimeHist.png", "orange")
 
-
-def testSelectPredictions(trap, sampleTime=30):
+def loadSimulatedSnapFiles(trap, sampleTime=10):
     
     conf = readconfig(config_filename)
     predict = Predictions(conf)
-    
-    # time1 = 235959
-    # time2 = 2    
-    # print(time1, time2, predict.addTimes(time1, time2))
-
-    # time1 = 235939
-    # time2 = 30    
-    # print(time1, time2, predict.addTimes(time1, time2))
-
-    # time1 = 21023
-    # time2 = 5030    
-    # print(time1, time2, predict.addTimes(time1, time2))
-    
-    # time1 = 21053
-    # time2 = 30    
-    # print(time1, time2, predict.addTimes(time1, time2))
     
     predictionsTrapPath = csvPath + trap + '/'
     threshold=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -521,19 +495,84 @@ def testSelectPredictions(trap, sampleTime=30):
             predicted = predict.load_predictions(predictionFile, filterTime=0, threshold=threshold)
             predictedSelect = predict.select_predictions(predicted, sampleTime)
             allPredictions += predictedSelect
-            #print(predictedSelect)
-    
-    print(len(allPredictions))
+        
+    return allPredictions
 
+def selectPredictedSampleTimes(predicted, sampleTime):
     
+    td = timedate()
+    sampleMinutes = td.getMinutes(sampleTime)
+    predictedSampleTime = []
+    for predict in predicted:
+        seconds = td.getSeconds(predict['time'])
+        if sampleMinutes == 0: # Seconds
+            if seconds % sampleTime == 0:
+                predictedSampleTime.append(predict)
+        else: # Minutes
+            minutes = td.getMinutes(predict['time'])
+            if seconds == 0 and minutes % sampleMinutes == 0:
+                predictedSampleTime.append(predict)
+                
+    return predictedSampleTime
+
+def analyseAbundanceSampleTime(trap, labelName, countsTh, percentageTh, resultFileName):
+    
+    td = timedate()    
+    figure = plt.figure(figsize=(20,20))
+    figure.tight_layout(pad=1.0)
+
+    dateList, dayOfYear, selDataset2 = loadTrackFiles(trap, countsTh, percentageTh)
+    predicted = loadSimulatedSnapFiles(trap)
+        
+    selDataset = selDataset2.loc[selDataset2['class'] == labelName]
+    abundance = countAbundance(selDataset, dateList)
+    
+    idxFig = 1
+    for sampleTime in [10, 30, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1500, 2000, 3000]:
+        
+        if "ax" in locals():
+            ax = figure.add_subplot(5, 3, idxFig, sharex = ax, sharey = ax) 
+        else:
+            ax = figure.add_subplot(5, 3, idxFig) 
+        
+        predictedSampleTime = selectPredictedSampleTimes(predicted, sampleTime)
+        abundanceTL = countSnapAbundance(predictedSampleTime, dateList, labelName)
+        correlation, _ = pearsonr(abundance, abundanceTL)
+        correlation = np.round(correlation * 10000)/10000
+        print(trap, labelName, len(selDataset), len(predictedSampleTime), sampleTime, correlation)
+
+        labelText = labelName + ' (track)'
+        ax.plot(dayOfYear, abundance, label=labelText, color="green")
+        labelText = labelName + ' (TL)'
+        ax.plot(dayOfYear, abundanceTL, label=labelText, color="black")
+        
+        #title += "  " + td.strMonthDay(dateList[0]) + '-' + td.strMonthDay((dateList[-1])) + r"  $\rho$=" + str(correlation)
+        title = trap + "  (" + str(sampleTime) + r")  $\rho$=" + str(correlation)
+        ax.set_title(title)
+        if idxFig == 15:
+            ax.legend()  
+        ax.set_yscale('log')
+        if idxFig in [13, 14, 15]: 
+            ax.set_xlabel('Day of Year')
+        if idxFig in [1, 4, 7, 10, 13]:
+            ax.set_ylabel('Observations')
+        
+        idxFig += 1
+    
+    plt.savefig("./results/" + resultFileName)
+    plt.show() 
+
     # %% Insect plots
 if __name__ == '__main__':
 
     countsTh = 2 # 4 sec or three detections in one track
     percentageTh = 50  
-    plt.rcParams.update({'font.size': 14})
+    plt.rcParams.update({'font.size': 12})
     
-    #testSelectPredictions("OH1")
+    trap = "OH2"
+    analyseAbundanceSampleTime(trap, "Lepidoptera Macros", countsTh, percentageTh, trap + "_SampleTime.png")
+
+    plt.rcParams.update({'font.size': 14})
     
     # %% Abundance plots
     #plotAbundanceSelectedClasses(countsTh, percentageTh)
@@ -549,7 +588,7 @@ if __name__ == '__main__':
     
     # %% Time histogram plots
     traps = ['OH1', 'OH2', 'OH3', 'OH4']
-    plotTimeHistogramsSelectedTrap(traps, countsTh, percentageTh, "OH")
+    #plotTimeHistogramsSelectedTrap(traps, countsTh, percentageTh, "OH")
     
     
     
