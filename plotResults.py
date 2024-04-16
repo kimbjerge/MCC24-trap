@@ -552,7 +552,7 @@ def analyseAbundanceSampleTime(trap, labelNames, countsTh, percentageTh, resultF
             sampleTimesCorrelation.append([sampleTime, correlation])
     
             labelText = labelName + ' (track)'
-            ax.plot(dayOfYear, abundance, label=labelText, color="green")
+            ax.plot(dayOfYear, abundance, label=labelText, color="red")
             labelText = labelName + ' (TL)'
             ax.plot(dayOfYear, abundanceTL, label=labelText, color="black")
             
@@ -571,7 +571,7 @@ def analyseAbundanceSampleTime(trap, labelNames, countsTh, percentageTh, resultF
         
         subtitle = trap + " " + labelName
         plt.suptitle(subtitle)
-        plt.tight_layout(pad=1.0)
+        #plt.tight_layout(pad=1.0)
         plt.savefig(resultFileName + "_" + labelName + ".png")
         plt.show() 
         
@@ -587,7 +587,7 @@ if __name__ == '__main__':
     plt.rcParams.update({'font.size': 12})
     
     # %% tíme-lapse sample times vs. motion tracks
-    traps = ['OH2'] #, 'LV2', 'SS2']
+    traps = ['OH2', 'LV2', 'SS2']
     for trap in traps:
         resultFileName = "./results/sampletimes/" + trap 
         trapCorrelations = analyseAbundanceSampleTime(trap, labelNamesPlot, countsTh, percentageTh, resultFileName)
