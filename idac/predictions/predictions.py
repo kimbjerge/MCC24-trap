@@ -237,7 +237,7 @@ class Predictions:
         currentTime = 999999
         foundPredictions = []
         if timeStamp < 120000:
-            timeStamp += 240000 # Use time from 120000 - 360000 to handle midthnight crossing
+            timeStamp += 240000 # Use time from 120000 - 360000 to handle midt night crossing
         for prediction in predictions:
             predictionTime =  prediction['time']
             if predictionTime < 120000:
