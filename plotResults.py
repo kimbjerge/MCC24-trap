@@ -9,6 +9,7 @@ import os
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+from numpy.linalg import norm
 #import json
 import datetime
 from scipy.stats import expon
@@ -127,11 +128,13 @@ def countSnapAbundance(predicted, dates, labelName, valid=True):
 def getDurationList(dataset, maxLimit):
     
     durations = []
+    allDurations = []
     for i, obj in dataset.iterrows():
+        allDurations.append(obj['duration'])
         if obj['duration'] < maxLimit:
             durations.append(obj['duration'])
     
-    return durations
+    return durations, allDurations
 
 def loadTrackFiles(trap, countsTh, percentageTh):
 
@@ -185,10 +188,22 @@ def plotTimeHistograms(traps, trackPath, countsTh, percentageTh, labelNames, res
         for labelName in labelNames:
             selDataset = selDataset2.loc[selDataset2['class'] == labelName]
             print(trap, labelName, len(selDataset))
-            durations = getDurationList(selDataset, maxLimit=1500)
+            durations, allDurations = getDurationList(selDataset, maxLimit=1500)
+            
 
             labelText = labelName 
             ax.hist(durations, bins=150, label=labelText, color=color)
+            ax.plot()
+            
+            averageDuration = int(round(np.mean(allDurations)))
+            print("Average duration", averageDuration)
+            steps = 20
+            step = 3000/steps
+            listPb = [step*i for i in range(steps)]            
+            listAvgD = [averageDuration for i in range(steps)]
+            plt.plot(listAvgD, listPb, 'k')
+            plt.text(200, 400, "Avg " + str(averageDuration), fontsize = 14)
+
             labels += ' ' + labelName
             colorIdx += 1  
             
@@ -525,14 +540,23 @@ def analyseAbundanceSampleTime(trap, labelNames, countsTh, percentageTh, resultF
     
     td = timedate()    
     dateList, dayOfYear, selDataset2 = loadTrackFiles(trap, countsTh, percentageTh)
-    predicted = loadSimulatedSnapFiles(trap)
+    
+    # Save time processing predicted CSV files
+    if os.path.exists(resultFileName + 'TL.npy'):
+        predicted = np.load(resultFileName + 'TL.npy', allow_pickle=True)
+        print("Load predicted file", resultFileName + 'TL.npy')
+    else:
+        predicted = loadSimulatedSnapFiles(trap)
+        np.save(resultFileName + 'TL.npy', predicted, allow_pickle=True)
+        print("Saved predicted file", resultFileName + 'TL.npy')
+        
     labelCorrelations = {}
     for labelName in labelNames:    
         figure = plt.figure(figsize=(15,15))
         figure.tight_layout(pad=1.0)
 
         selDataset = selDataset2.loc[selDataset2['class'] == labelName]
-        abundance = countAbundance(selDataset, dateList)
+        abundanceTrack = countAbundance(selDataset, dateList)
         
         idxFig = 1
         sampleTimesCorrelation = []
@@ -546,20 +570,23 @@ def analyseAbundanceSampleTime(trap, labelNames, countsTh, percentageTh, resultF
             
             predictedSampleTime = selectPredictedSampleTimes(predicted, sampleTime)
             abundanceTL = countSnapAbundance(predictedSampleTime, dateList, labelName)
-            correlation, _ = pearsonr(abundance, abundanceTL)
+            
+            correlation, _ = pearsonr(abundanceTrack, abundanceTL)
             correlation = np.round(correlation * 10000)/10000
-            print(trap, labelName, len(selDataset), len(predictedSampleTime), sampleTime, correlation)
-            sampleTimesCorrelation.append([sampleTime, correlation])
+            cosine = np.dot(abundanceTrack,abundanceTL)/(norm(abundanceTrack)*norm(abundanceTL))
+            cosine = np.round(cosine * 10000)/10000
+            print(trap, labelName, len(dayOfYear),  sum(abundanceTrack), sum(abundanceTL), sampleTime, correlation, cosine)
+            sampleTimesCorrelation.append([sampleTime, len(dayOfYear), sum(abundanceTrack), sum(abundanceTL), correlation, cosine])
     
             labelText = labelName + ' (track)'
-            ax.plot(dayOfYear, abundance, label=labelText, color="red")
+            ax.plot(dayOfYear, abundanceTrack, label=labelText, color="red")
             labelText = labelName + ' (TL)'
             ax.plot(dayOfYear, abundanceTL, label=labelText, color="black")
             
             #title += "  " + td.strMonthDay(dateList[0]) + '-' + td.strMonthDay((dateList[-1])) + r"  $\rho$=" + str(correlation)
-            title = "  TL=" + td.formatTime(sampleTime) + r" $\rho$=" + str(correlation)
+            title = "  TL=" + td.formatTime(sampleTime) + r" $\rho$=" + str(correlation) + " cs=" + str(cosine)
             ax.set_title(title)
-            if idxFig == 9: #15
+            if idxFig in [1, 9]: #15
                 ax.legend()  
             ax.set_yscale('log')
             if idxFig in [7, 8, 9]: #[13, 14, 15]: 
@@ -579,21 +606,32 @@ def analyseAbundanceSampleTime(trap, labelNames, countsTh, percentageTh, resultF
         
     return labelCorrelations
 
+def analyseSampleTime(countsTh, percentageTH):
+
+    plt.rcParams.update({'font.size': 12})
+
+    #traps = ['OH2', 'LV2', 'SS2']  
+    #traps = ['OH4', 'LV4', 'SS4']  
+    traps =['OH2']
+    for trap in traps:
+        resultFileName = "./results/sampletimes/" + trap 
+        labelNames =  ["Lepidoptera Macros"] #, "Lepidoptera Micros"]
+        trapCorrelations = analyseAbundanceSampleTime(trap, labelNamesPlot, countsTh, percentageTh, resultFileName)
+        print(trap, trapCorrelations)
+        dstNpyfile = resultFileName+".npy"
+        np.save(dstNpyfile, trapCorrelations, allow_pickle=True) 
+    
+
     # %% Insect plots
 if __name__ == '__main__':
 
     countsTh = 2 # 4 sec or three detections in one track
     percentageTh = 50  
-    plt.rcParams.update({'font.size': 12})
     
     # %% tíme-lapse sample times vs. motion tracks
-    traps = ['OH2', 'LV2', 'SS2']
-    for trap in traps:
-        resultFileName = "./results/sampletimes/" + trap 
-        trapCorrelations = analyseAbundanceSampleTime(trap, labelNamesPlot, countsTh, percentageTh, resultFileName)
-        print(trap, trapCorrelations)
-        dstNpyfile = resultFileName+".npy"
-        np.save(dstNpyfile, trapCorrelations, allow_pickle=True) 
+    
+    analyseSampleTime(countsTh, percentageTh)
+    
     
     plt.rcParams.update({'font.size': 14})
     
@@ -629,3 +667,4 @@ if __name__ == '__main__':
     #df = pd.read_json(trackPath + 'statistics.json')
     #print(df.to_string()) 
 
+    plt.rcParams.update({'font.size': 12})
