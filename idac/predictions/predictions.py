@@ -216,12 +216,12 @@ class Predictions:
             
         return validTimeStamps
     
-    def findPredictionsCloseToTime(self, predictions, timeStamp):
+    def findPredictionsCloseToTimeForward(self, predictions, timeStamp): #V1 forward in time
         
         currentTime = 999999
         foundPredictions = []
         for prediction in predictions:
-            if timeStamp < 120000 and prediction['time'] > 120000: # No recording during day time
+            if timeStamp < 120000 and prediction['time'] > 120000: # Search for timestamp after midtnight
                 continue
             if prediction['time'] >= timeStamp:
                 if currentTime == 999999:
@@ -231,61 +231,46 @@ class Predictions:
                 foundPredictions.append(prediction.copy())
                 
         return foundPredictions
+                 
+    def findPredictionsCloseToTimeBackward(self, predictions, timeStamp):
+        
+        currentTime = 999999
+        foundPredictions = []
+        if timeStamp < 120000:
+            timeStamp += 240000 # Use time from 120000 - 360000 to handle midthnight crossing
+        for prediction in predictions:
+            predictionTime =  prediction['time']
+            if predictionTime < 120000:
+                predictionTime += 240000 
+            if predictionTime <= timeStamp:
+                if currentTime == 999999:
+                    currentTime = prediction['time']
+                elif prediction['time'] != currentTime: 
+                    break # Use only detections close to timeStamp
+                foundPredictions.append(prediction.copy())
                 
-    def select_predictions(self, predictions, deltaTime=0, startTime=230000, endTime=30000):
+        return foundPredictions
+    
+    def select_predictions(self, predictions, deltaTime=0, startTime=230000, endTime=30000, backward=True):
         
         selectedPredictions=[]
         validTimeStamps = self.getValidTimeStamps(deltaTime, startTime=startTime, endTime=endTime)
         #print(validTimeStamps)
+
+        reverse_predictions= sorted(predictions, key=lambda d: (d['date']*1000000+d['time']), reverse=True)
         
         for timeStamp in validTimeStamps:
             
-            selectPredictions = self.findPredictionsCloseToTime(predictions, timeStamp)
+            if backward:
+                selectPredictions = self.findPredictionsCloseToTimeBackward(reverse_predictions, timeStamp)
+            else:
+                selectPredictions = self.findPredictionsCloseToTimeForward(predictions, timeStamp)
             
             for insect in selectPredictions:
                 insect['time'] = timeStamp
-                #print(insect['time'], insect['timeRec'])
+                #if timeStamp > 235900 or timeStamp < 200:
+                #print(insect['time'], insect['timeRec'], insect['key'])
                 selectedPredictions.append(insect)
-                
-        # lastTime = 0
-        # lastValidTime = startTime
-        # validTime = False
-        # for insect in predictions:
-        #     recTime = insect['time']
-            
-            # startValid = False
-            # if self.getHours(startTime) >= 12: # Check above 12:00:00
-            #     if recTime >= startTime or recTime < 12000:
-            #         startValid = True
-            # else:
-            #     if recTime >= startTime or recTime >= 12000:
-            #         startValid = True
-                    
-            # endValid = False
-            # if self.getHours(endTime) >= 12: # Check above 12:00:00
-            #     if recTime <= endTime or recTime < 12000:
-            #         endValid = True
-            # else:
-            #     if recTime <= endTime or recTime >= 12000:
-            #         endValid = True
-            
-            #if startValid and endValid: # Prediction within intervals startTime - endTime
-
-            # if recTime != lastTime:
-            #     nextTime = self.addTimes(lastValidTime, deltaTime)
-            #     #print("Next", nextTime)
-            #     if nextTime > 230000 and recTime < 10000: # Midnight
-            #         nextTime = 0
-            #     if recTime >= nextTime:
-            #         print(recTime)
-            #         validTime = True
-            #         lastValidTime = recTime
-            #     else:
-            #         validTime = False                        
-            #     lastTime = recTime
-                
-            # if validTime:
-            #     selectedPredictions.append(insect)
         
         return selectedPredictions
 
