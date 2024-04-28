@@ -96,7 +96,7 @@ if __name__=='__main__':
     #image_base_path = "C:/IHAK/few-shot-novelty/data/euMoths/images/"
     image_base_path = "O:/Tech_TTH-KBE/MAVJF/Training data moths classifier/MothSpecies1/"
     #image_base_path = "/mnt/Dfs/Tech_TTH-KBE/MAVJF/Training data moths classifier/MothSpecies1/"
-    classModel = classifier.UKDenmarkMothSpeciesClassifierMixedResolution(image_base_path)
+    classModel = classifier.UKDenmarkMothSpeciesClassifierMixedResolution("")
     #labels = classifier.get_category_map()
     totalSpecies = 0
     trueSpecies = 0
