@@ -103,10 +103,12 @@ class InferenceBaseClass:
     def __init__(
         self,
         #KBE??? db_path: Union[str, sqlalchemy.engine.URL],
+        user_data_path: FilePath,
         image_base_path: FilePath,
         **kwargs,
     ):
         #KBE??? self.db_path = db_path
+        self.user_data_path = user_data_path
         self.image_base_path = image_base_path
 
         for k, v in kwargs.items():
@@ -134,10 +136,6 @@ class InferenceBaseClass:
             return cls.key  # type: ignore
         else:
             return slugify(cls.name)
-    
-    #KBE???
-    #def get_category_map(self):
-    #    return self.category_map
     
     def get_weights(self, weights_path):
         if weights_path:

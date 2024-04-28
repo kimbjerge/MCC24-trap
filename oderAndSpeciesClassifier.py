@@ -14,13 +14,13 @@ from scipy.stats import norm
 from resnet50 import ResNet50
 import ml.models.classification as speciesClassifier
 
-
 class orderSpeciesClassifier:
     '''ResNet-50 Architecture with pretrained weights
     '''
-    def __init__(self, savedWeights, thresholdFile, device, img_size):
+    def __init__(self, speciesModelPath, savedOrderWeights, thresholdFile, device, img_size):
         
-        print("Order classifier - threshold file", thresholdFile, "and weights", savedWeights, "of image size", img_size)
+        print("Moth species model path", speciesModelPath)
+        print("Order classifier - threshold file", thresholdFile, "and weights", savedOrderWeights, "of image size", img_size)
 
         data_thresholds = pd.read_csv(thresholdFile)
         self.labels = data_thresholds["ClassName"].to_list()
@@ -33,14 +33,14 @@ class orderSpeciesClassifier:
         self.img_size = img_size
         self.device = device
 
-        # Use the AMI classifier model
-        self.speciesModel = speciesClassifier.UKDenmarkMothSpeciesClassifierMixedResolution("")
+        # Load the AMI moth species classifier model, create model with image_size = 128 (Fixed in code)
+        self.speciesModel = speciesClassifier.UKDenmarkMothSpeciesClassifierMixedResolution(speciesModelPath, "")
     
         num_classes=len(self.labels)
-        print("Use ResNet50 and load weights with num. classes", num_classes)
+        print("Order classifier uses ResNet50 and load weights with num. classes", num_classes)
         
         self.orderModel = ResNet50(num_classes=num_classes) 
-        self.orderModel.load_state_dict(torch.load(savedWeights, map_location=device))
+        self.orderModel.load_state_dict(torch.load(savedOrderWeights, map_location=device))
         self.orderModel = self.orderModel.to(device)
         self.batch_size = 1
         self.batch_idx = 0
@@ -53,7 +53,6 @@ class orderSpeciesClassifier:
         #print("Batch created of size", self.batch_size)
         
     def appendToBatch(self, imageCrop):
-        
         if self.batch_idx < self.batch_size:
             image = cv2.resize(imageCrop, (self.img_size, self.img_size))
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -65,8 +64,7 @@ class orderSpeciesClassifier:
     
         return False
     
-    def classifyOrderBatch(self):
-                  
+    def classifyOrderBatch(self):            
         self.imagesInBatch = self.imagesInBatch.to(self.device)
         predictions = self.orderModel(self.imagesInBatch)
         predictions = predictions.cpu().detach().numpy()
@@ -88,8 +86,6 @@ class orderSpeciesClassifier:
         return lines, predictions
 
     def classifySpeciesBatch(self):
-                  
-        self.imagesInBatch = self.imagesInBatch.to(self.device)
         predictions = self.speciesModel.predict_batch(self.imagesInBatch)
         predictions = predictions.detach()
         predLabelsScores = self.speciesModel.post_process_batch(predictions)
@@ -99,8 +95,8 @@ class orderSpeciesClassifier:
         for pred in predLabelsScores:
             predicted_label_text = pred[0]
             confidence_value = round(pred[1]*10000)/100
-            #line = f"{predicted_label_text},{predicted_label},{confidence_value}"
-            line = f"{predicted_label_text},{confidence_value}"
+            predicted_label = pred[2]
+            line = f"{predicted_label_text},{predicted_label},{confidence_value}"
             #print(line)
             lines.append(line)
         

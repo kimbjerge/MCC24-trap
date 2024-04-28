@@ -13,8 +13,6 @@ from torchvision import transforms
 import matplotlib.pyplot as plt
 import ml.models.classification as classifier
 
-
-
 def plotConfusionMatrixLevel(levelName, level_predict, level_label, labels, normalize=False, font_size=12):
 
     matrix = np.zeros((len(labels), len(labels))).astype('int')
@@ -96,7 +94,7 @@ if __name__=='__main__':
     #image_base_path = "C:/IHAK/few-shot-novelty/data/euMoths/images/"
     image_base_path = "O:/Tech_TTH-KBE/MAVJF/Training data moths classifier/MothSpecies1/"
     #image_base_path = "/mnt/Dfs/Tech_TTH-KBE/MAVJF/Training data moths classifier/MothSpecies1/"
-    classModel = classifier.UKDenmarkMothSpeciesClassifierMixedResolution("")
+    classModel = classifier.UKDenmarkMothSpeciesClassifierMixedResolution("./ami", "")
     #labels = classifier.get_category_map()
     totalSpecies = 0
     trueSpecies = 0
@@ -150,7 +148,7 @@ if __name__=='__main__':
                     if classDir in pred[0]:
                         correct = True
                         trueSpecies += 1
-                    print(pred[0], pred[1], correct)
+                    print(pred[0], pred[1], pred[2], correct)
                 #predictions = predictions.cpu().detach().numpy()
                 #predicted_labels = np.argmax(predictions, axis=1)    
         

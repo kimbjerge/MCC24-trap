@@ -151,7 +151,7 @@ class Resnet50Classifier(InferenceBaseClass):
         labels = [self.category_map[cat] for cat in categories]
         scores = predictions.max(axis=1).astype(float)
 
-        result = list(zip(labels, scores))
+        result = list(zip(labels, scores, categories))
         logger.debug(f"Post-processing result batch: {result}")
         return result
 
@@ -160,7 +160,7 @@ class Resnet50ClassifierLowRes(Resnet50Classifier):
     input_size = 128
 
     def get_model(self):
-        #KBE??? model = torchvision.models.resnet50(weights=None)
+        #KBE??? model = torchvision.models.resnet50(weights=None) # Newer version of torchvision
         model = torchvision.models.resnet50(pretrained=False)
         num_ftrs = model.fc.in_features
         assert (

@@ -50,13 +50,21 @@ from utils.torch_utils import select_device, time_sync
 
 from oderAndSpeciesClassifier import orderSpeciesClassifier
 
+# Functions used to create and write detection and classification results to CSV file
+def createCSVFile(fileName):
+    
+    # Create CSV result file with header if it doesn't exist
+    if os.path.exists(fileName) == False:
+        headerLine = "year,trap,date,time,detectConf,detectId,x1,y1,x2,y2,fileName,orderLabel,orderId,orderConf,aboveTH,key,speciesLabel,speciesId,speciesConf\n"
+        file = open(fileName, "w+")
+        file.write(headerLine)
+        file.close()
+            
 def appendToCSV(orderSpeciesClass, img, srcpath, name, imsize, cls, x, y, w, h, conf):
 
+    # Create line to append to CSV file 
     height = imsize[0]
     width = imsize[1]
-    #print(height, width)
-    #print(cls.item())
-    #print(x, y, w, h) # Center, width and heighe of boundingbox
 
     x1 = int(round((x - w/2)*width))
     if x1 < 0: x1 = 0
@@ -79,27 +87,21 @@ def appendToCSV(orderSpeciesClass, img, srcpath, name, imsize, cls, x, y, w, h, 
 
     splitpath = srcpath.split('/')
     
-    system = splitpath[len(splitpath)-3]
-    camera = splitpath[len(splitpath)-2]
-    #system = splitpath[len(splitpath)-2]
-    #camera = splitpath[len(splitpath)-1]
+    #Motion images
+    #system = splitpath[len(splitpath)-3]
+    #camera = splitpath[len(splitpath)-2]
+    
+    #Snap images
+    system = splitpath[len(splitpath)-2]
+    camera = splitpath[len(splitpath)-1]
     
     lastpath = splitpath[len(splitpath)-3] + '/' + splitpath[len(splitpath)-2] + '/' + splitpath[len(splitpath)-1]
 
-    #print(conf.item())
-    #print('---------------------------------------------------')
-
-    #filename = srcpath + name
-    #file_created = os.path.getmtime(filename)
-    #file_time = dt.datetime.fromtimestamp(file_created)
-    #datestr = file_time.strftime("%Y%m%d")
-    #timestr = file_time.strftime("%H%M%S")
-
     datetimestr= name
-    #datetimestr = name.split('_')[1]
     datestr = datetimestr[0:8]
     timestr = datetimestr[8:14]
 
+    # First part of line containing: "year,trap,date,time,detectConf,detectId,x1,y1,x2,y2,fileName"
     line = system + ','
     line += camera + ','
     line += datestr + ','
@@ -115,6 +117,7 @@ def appendToCSV(orderSpeciesClass, img, srcpath, name, imsize, cls, x, y, w, h, 
     #print(line)
     return line
 
+# Original run method from YOLOv5 code base extended with order and species classification (ResNet50)
 @torch.no_grad()
 def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
         source=ROOT / 'data/images',  # file/dir/URL/glob, 0 for webcam
@@ -142,10 +145,12 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
         hide_conf=False,  # hide confidences
         half=False,  # use FP16 half-precision inference
         dnn=False,  # use OpenCV DNN for ONNX inference
-        resnet='',
-        labels='',
+        order_model='',
+        order_labels='',
+        species_model='',
         result=''
         ):
+    
     source = str(source)
     save_img = not nosave and not source.endswith('.txt')  # save inference images
     is_file = Path(source).suffix[1:] in (IMG_FORMATS + VID_FORMATS)
@@ -160,12 +165,16 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
 
     # Load model
     device = select_device(device)
+    print("Device", device.type)
     model = DetectMultiBackend(weights, device=device, dnn=dnn, data=data)
     stride, names, pt, jit, onnx, engine = model.stride, model.names, model.pt, model.jit, model.onnx, model.engine
     imgsz = check_img_size(imgsz, s=stride)  # check image size
-      
+
+    # Create result file with detections and classification       
+    dstCSVfile = result + '.csv'
+    createCSVFile(dstCSVfile)
     # Create order classifier
-    orderSpeciesClass = orderSpeciesClassifier(resnet, labels, 'cuda:0', 128)
+    orderSpeciesClass = orderSpeciesClassifier(species_model, order_model, order_labels, device.type, 128)
 
     # Half
     half &= (pt or jit or onnx or engine) and device.type != 'cpu'  # FP16 supported on limited backends with CUDA
@@ -264,11 +273,11 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
                         if save_crop:
                             save_one_box(xyxy, imc, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
 
+                # Perform classification of detections at order and moth species rank
                 lineOrderPredictions, predictions = orderSpeciesClass.classifyOrderBatch()
                 lineSpeciesPredictions, _ = orderSpeciesClass.classifySpeciesBatch()
-                
-                dstCSVfile = result + '.csv'
                 for idx in range(len(csvLines)):
+                    # line = "year,trap,date,time,detectConf,detectId,x1,y1,x2,y2,fileName,orderLabel,orderId,orderConf,aboveTH,key,speciesLabel,speciesId,speciesConf\n"
                     line = csvLines[idx] + ',' + lineOrderPredictions[idx] + ',' + str(keyIdx) + ',' + lineSpeciesPredictions[idx] + '\n'
                     predictionsList.append(predictions[idx])
                     keyIdx += 1
@@ -349,8 +358,9 @@ def parse_opt():
     parser.add_argument('--hide-conf', default=False, action='store_true', help='hide confidences')
     parser.add_argument('--half', action='store_true', help='use FP16 half-precision inference')
     parser.add_argument('--dnn', action='store_true', help='use OpenCV DNN for ONNX inference')
-    parser.add_argument('--resnet', type=str, default='./saved_resnet_128/dhc_best.pth', help='Resnet weights for oder classifier')
-    parser.add_argument('--labels', type=str, default='./saved_resnet_128/thresholdsTestTrain.csv', help='CSV file with labels and thresholds')
+    parser.add_argument('--order-model', type=str, default='./saved_resnet_128/dhc_best.pth', help='Resnet weights for oder classifier')
+    parser.add_argument('--order-labels', type=str, default='./saved_resnet_128/thresholdsTestTrain.csv', help='CSV file with labels and thresholds')
+    parser.add_argument('--species-model', type=str, default='./ami', help='Path to save and load AMI moth species classifier')
     parser.add_argument('--result', type=str, default='resultMoths', help='Result file name for CSV and NPY files')
     opt = parser.parse_args()
     opt.imgsz *= 2 if len(opt.imgsz) == 1 else 1  # expand
