@@ -89,7 +89,7 @@ def printPredictionSnapStatistics(trapNames, predict):
 
 def printTrackStatistics(trapNames, countsTh, percentageTh):
     
-    trackPath = "./tracks/"
+    trackPath = "./tracks/tracks_order/"
     
     tracksTotal = 0
     tracksValidTotal = 0
@@ -121,7 +121,7 @@ if __name__=='__main__':
     
     trapNames = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3', 'SS4']
     
-    printPredictionStatistics(trapNames, predict)
-    printPredictionSnapStatistics(trapNames, predict)
+    #printPredictionStatistics(trapNames, predict)
+    #printPredictionSnapStatistics(trapNames, predict)
     printTrackStatistics(trapNames, 2, 50)
     
