@@ -10,6 +10,7 @@
       "species": ["Araneae", "Coleoptera", "Diptera Brachycera", "Diptera Nematocera", "Diptera Tipulidae", 
                   "Diptera Trichocera", "Ephemeroptera", "Hemiptera", "Hymenoptera Other", "Hymenoptera Vespidae", 
                   "Lepidoptera Macros", "Lepidoptera Micros", "Neuroptera", "Opiliones", "Trichoptera", "Vegetation"],
+      "speciesJSON" : "ami/models/01-moths-ukdenmark_v2_category_map_species_names.json",
       "imagedimension": 128,
 	  "threshold_unknown": 60,
 	  "unknown_dir": "unknowns",
@@ -44,9 +45,6 @@
       "backgroundpath": "./sample_background.jpg"
    },
 
-   "imagemod":{
-   },
-
    "tracker":{
       "distance_cost_weight": 2.5,
       "area_cost_weight": 0.7,
@@ -62,7 +60,7 @@
       "maximages": -1,
       "resultdir": "./tracks",
       "writeimages": false,
-      "writemovie": false,
+      "writemovie": true,
       "moviesize": false,
       "fps":5
    },

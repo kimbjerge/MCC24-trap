@@ -3,7 +3,7 @@
 """
 Created on Fri Aug 30 09:22:55 2019
 
-@author: jakob
+@author: jakob modified by kim
 """
 
 
@@ -23,6 +23,7 @@ class ObjectOfInterrest:
         self.id = id
         self.centerhist = []
         self.label = ''
+        self.order = ''
         self.percent = 0
         self.updatecenterhist()
         self.labelhist = []
@@ -37,6 +38,7 @@ class ObjectOfInterrest:
 
     def copy(self, oi):
         self.label = oi.label
+        self.order = oi.order
         self.percent = oi.percent
         self.confidenceAvg = oi.confidenceAvg
         self.key = oi.key

@@ -92,7 +92,7 @@ if __name__=='__main__':
     #device = "cuda"
     #device = "cpu"
     #image_base_path = "C:/IHAK/few-shot-novelty/data/euMoths/images/"
-    image_base_path = "O:/Tech_TTH-KBE/MAVJF/Training data moths classifier/MothSpecies1/"
+    image_base_path = "O:/Tech_TTH-KBE/MAVJF/Training data moths classifier/MothSpeciesDK/" #MothSpecies1 (+EU-Moths)
     #image_base_path = "/mnt/Dfs/Tech_TTH-KBE/MAVJF/Training data moths classifier/MothSpecies1/"
     classModel = classifier.UKDenmarkMothSpeciesClassifierMixedResolution("./ami", "")
     #labels = classifier.get_category_map()

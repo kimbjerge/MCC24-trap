@@ -175,34 +175,125 @@ class Predictions:
                         scores = predictScores[key]
                     
                     record = {'system': subsplit[0], # 1-5
-                    'camera': subsplit[1], # 0 or 1
-                    'date' : int(subsplit[2]),
-                    'time' : int(subsplit[3]),
-                    'timeRec' : int(subsplit[3]),
-                    'prob' : prob, # Class probability 0-100%
-                    'class' : objClass, # Classes 0-15
-                    'className' : subsplit[11],
-                    'valid' : subsplit[14] == 'True',
-                    'key' : key, # Index to predictions
-                    'scores' : scores,
-                    # Box position and size
-                    'x1' : x1,
-                    'y1' : y1,
-                    'x2' : x2,
-                    'y2' : y2,
-                    'xc' : xc,
-                    'yc' : yc,
-                    'w' : width,
-                    'h' : height,
-                    'image' : imgpath[3],
-                    'pathimage' : subsplit[10],
-                    'label' : 0} # Class label (Unknown = 0)
-                    
+                            'camera': subsplit[1], # 0 or 1
+                            'date' : int(subsplit[2]),
+                            'time' : int(subsplit[3]),
+                            'timeRec' : int(subsplit[3]),
+                            'prob' : prob, # Class probability 0-100%
+                            'class' : objClass, # Classes 0-15
+                            'className' : subsplit[11],
+                            'valid' : subsplit[14] == 'True',
+                            'key' : key, # Index to predictions
+                            'scores' : scores,
+                            # Box position and size
+                            'x1' : x1,
+                            'y1' : y1,
+                            'x2' : x2,
+                            'y2' : y2,
+                            'xc' : xc,
+                            'yc' : yc,
+                            'w' : width,
+                            'h' : height,
+                            'image' : imgpath[3],
+                            'pathimage' : subsplit[10],
+                            'label' : 0} # Class label (Unknown = 0)
+                            
                     
                     lastObjects, newObject =  self.filter_prediction(lastObjects, record, filterTime)
                     if newObject:
-                        foundObjects.append(record)
-                        
+                        foundObjects.append(record)                      
+                
+        return foundObjects    
+
+    # Load prediction CSV file with header, oder and moth species classifications
+    # filterTime specifies in minutes how long time window used
+    # to decide if predictions belongs to the same object
+    # probability threshold for each class, default above 50%
+    def load_species_predictions(self, filename, selection = 'All', filterTime=0, threshold=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], scoresFilename=None):
+        
+        if scoresFilename is None:
+            predictScores = None
+        else:
+            predictScores = np.load(scoresFilename, allow_pickle=True)
+     
+        file = open(filename, 'r')
+        content = file.read()
+        file.close()
+        splitted = content.split('\n')
+        lines = len(splitted)
+        foundObjects = []
+        lastObjects = []
+        first=True
+        for line in range(lines):
+            subsplit = splitted[line].split(',')
+            if first:
+                if len(subsplit) != 19:
+                    print("Wrong header in CSV file", line)
+                first = False
+                continue # Skip first line 
+            if len(subsplit) == 19: # required 19 data values
+                imgname = subsplit[10]
+                imgpath = imgname.split('/')
+                orderClassName = subsplit[11]
+                prob = float(subsplit[13]) # 4
+                objClass = int(subsplit[12])+1 # 5
+                speciesName = subsplit[16] # Moth species for Lepidoptera Macros and Micros
+                classSpecies = int(subsplit[17])
+                confSpecies = float(subsplit[18]) # Confidence of species classifier
+
+                #prob = int(subsplit[4])
+                #objClass = int(subsplit[5])
+                # Check selection 
+                if (selection == imgpath[0] or selection == 'All') and prob >= threshold[objClass-1]:
+                    x1 = int(subsplit[6])
+                    y1 = int(subsplit[7])
+                    x2 = int(subsplit[8])
+                    y2 = int(subsplit[9])
+                    # Convert points of box to YOLO format: center point and w/h
+                    width = x2-x1
+                    height = y2-y1
+                    xc = x1 - round(width/2)
+                    if xc < 0: xc = 0
+                    yc = y1 - round(height/2)
+                    if yc < 0: yc = 0
+                    key = int(subsplit[15]) # Index to prediction scores
+                    if predictScores is None:
+                        scores = None
+                    else:
+                        scores = predictScores[key]
+                    
+                    record = {'system': subsplit[0], # 1-5
+                            'camera': subsplit[1], # 0 or 1
+                            'date' : int(subsplit[2]),
+                            'time' : int(subsplit[3]),
+                            'timeRec' : int(subsplit[3]),
+                            # Oder classification
+                            'prob' : prob, # Class probability 0-100%
+                            'class' : objClass, # Order classes 0-15
+                            'className' : orderClassName,
+                            'valid' : subsplit[14] == 'True',
+                            'key' : key, # Index to predictions
+                            'scores' : scores,
+                            # Species classification
+                            'confSpecies' : confSpecies, # Confidence score of species classification
+                            'classSpecies' : classSpecies, # Moth species ID classified
+                            'speciesName' : speciesName, # Moth species name
+                            # Box position and size
+                            'x1' : x1,
+                            'y1' : y1,
+                            'x2' : x2,
+                            'y2' : y2,
+                            'xc' : xc,
+                            'yc' : yc,
+                            'w' : width,
+                            'h' : height,
+                            'image' : imgpath[3],
+                            'pathimage' : subsplit[10],
+                            'label' : 0} # Class label (Unknown = 0)
+                                                
+                    lastObjects, newObject =  self.filter_prediction(lastObjects, record, filterTime)
+                    if newObject:
+                        foundObjects.append(record)                      
                 
         return foundObjects    
     
@@ -275,7 +366,7 @@ class Predictions:
         return selectedPredictions
 
     # Find bounding boxes and classes found in image by filename
-    def findboxes(self, filename, predictions):
+    def findboxes(self, filename, predictions, useSpeciesPredictions=False):
          
         ooi = []
         count = 0
@@ -283,16 +374,23 @@ class Predictions:
             if filename == predict['image']:
                 obj = ObjectOfInterrest(predict['x1'], predict['y1'], predict['w'], predict['h'])
                 obj.confidenceAvg = predict['prob'] # Average confidence
+                obj.percent = predict['prob'] 
                 #obj.label = predict['className']
-                obj.features = predict['scores']
                 obj.label = self.species[predict['class']-1]
+                obj.order = obj.label
+                if useSpeciesPredictions:
+                    if "Lepidoptera" in obj.label: 
+                        # If order of lepidoptera then use species classification name and confidence
+                        obj.label = predict['speciesName'].replace('Â','') # Wrong chacter in label???
+                        obj.percent = predict['confSpecies']
+                obj.features = predict['scores']
                 obj.valid = predict['valid']
                 obj.key = predict['key']
-                obj.percent = predict['prob'] 
                 obj.timesec = self.getTimesec(predict['time']) 
                 #print(obj.label, obj.percent, obj.timesec)
                 ooi.append(obj)
                 count = count + 1
 
         return count, ooi
+
          

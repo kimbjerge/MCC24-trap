@@ -8,18 +8,22 @@ class TracksSave:
     def __init__(self, fileName):
         self.tracksFileName = fileName
         self.tracksFile = open(fileName, 'w')
-        headerline = "id,key,date,time,confidence,valid,class,xc,yc,x1,y1,width,height,image\n"
+        headerline = "id,key,date,time,confidence,valid,order,species,xc,yc,x1,y1,width,height,image\n"
         self.tracksFile.write(headerline) 
  
     def save(self, predict, ois):
         for oi in ois:
+            species = "none"
+            if "Lepidoptera" in oi.order: # Moth
+                species = oi.label
             line = str(oi.id) + ',' + \
                    str(oi.key) + ',' + \
                    str(predict['date']) + ',' + \
                    str(predict['time']) + ',' + \
                    str(oi.percent) + ',' + \
                    str(oi.valid) + ',' + \
-                   oi.label  + ',' + \
+                   oi.order + ',' + \
+                   species  + ',' + \
                    str(int(oi.x + oi.w / 2)) + ',' + \
                    str(int(oi.y + oi.h / 2)) + ',' + \
                    str(oi.x) + ',' + \

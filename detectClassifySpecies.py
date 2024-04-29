@@ -88,12 +88,12 @@ def appendToCSV(orderSpeciesClass, img, srcpath, name, imsize, cls, x, y, w, h, 
     splitpath = srcpath.split('/')
     
     #Motion images
-    #system = splitpath[len(splitpath)-3]
-    #camera = splitpath[len(splitpath)-2]
+    system = splitpath[len(splitpath)-3]
+    camera = splitpath[len(splitpath)-2]
     
     #Snap images
-    system = splitpath[len(splitpath)-2]
-    camera = splitpath[len(splitpath)-1]
+    #system = splitpath[len(splitpath)-2]
+    #camera = splitpath[len(splitpath)-1]
     
     lastpath = splitpath[len(splitpath)-3] + '/' + splitpath[len(splitpath)-2] + '/' + splitpath[len(splitpath)-1]
 
@@ -173,7 +173,7 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
     # Create result file with detections and classification       
     dstCSVfile = result + '.csv'
     createCSVFile(dstCSVfile)
-    # Create order classifier
+    # Create moth species and order classifier
     orderSpeciesClass = orderSpeciesClassifier(species_model, order_model, order_labels, device.type, 128)
 
     # Half
