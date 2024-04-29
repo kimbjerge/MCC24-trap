@@ -28,7 +28,9 @@ saved_resnet_128 - contains ResNet50 model weights for oder classifier and thres
 
 ### YOLOv5 object detector files ###
 data - YOLO configuration yaml files
+
 models - YOLO yaml models and code
+
 utils - YOLO source code
 
 ### Training YOLOv5 insect detector ###
