@@ -1,1 +1,3 @@
-conda create -n <environment-name> --file envreq.txt
+conda create -n PyTorch_AMI --file envreq.txt
+conda activate PyTorch_AMI
+conda list -e
