@@ -13,19 +13,22 @@ from skimage import io
 from idac.configreader.configreader import readconfig
 from idac.datareader.data_reader import DataReader
 from idac.tracker.tracker import Tracker
-#from idac.blobdet.blob_detector_factory import BlobDetectorFactory
+from idac.tracker.tracksSave import TracksSave
 from idac.imagemod.image_mod import Imagemod
 from idac.moviemaker.movie_maker import MovieMaker
-#from idac.classifier.classifier_factory import ClassifierFactory
-from idac.stats.stats import Stats
 from idac.predictions.predictions import Predictions
-from idac.tracksSave.tracksSave import TracksSave
 
 # Label names for plot
 #labelNames = ["Araneae", "Coleoptera", "Brachycera", "Nematocera", "Tipulidae", "Trichocera", "Ephemeroptera", "Hemiptera",
 #              "Hymenoptera", "Vespidae", "Macros", "Micros", "Neuroptera", "Opiliones", "Trichoptera", "Vegetation"]
 
 config_filename = './ITC_config.json'
+
+useSpeciesPredictions=True
+if useSpeciesPredictions:
+    from idac.stats.statsSpecies import Stats
+else:    
+    from idac.stats.stats import Stats
        
 def run(imgPath, dirName, csvPath, trapName='', useFeatureVector=True):
     
@@ -44,13 +47,11 @@ def run(imgPath, dirName, csvPath, trapName='', useFeatureVector=True):
     reader = DataReader(conf)
     gen = reader.getimage()
     print(type(gen))
-    #bl = BlobDetectorFactory.get_blob_detector(conf['blobdetector']['type'], conf)
     tr = Tracker(conf)
     imod = Imagemod()
     if dirName == '':
         dirName = 'tracks'
     mm = MovieMaker(conf, name=dirName + '.avi')
-    #clas = ClassifierFactory.get_classifier(conf['classifier']['type'], conf)
     stat = Stats(conf)
     predict = Predictions(conf)
     tracksFilename = conf['moviemaker']['resultdir']+'/'+dirName+'TRS.csv'
@@ -63,12 +64,13 @@ def run(imgPath, dirName, csvPath, trapName='', useFeatureVector=True):
     else:
         npyFilename = None
     threshold=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    predicted = predict.load_predictions(csvFilename, filterTime=0, threshold=threshold, scoresFilename=npyFilename) #, endTime=1000) # Skip if not moved within 5 minutes
+    if useSpeciesPredictions:
+        predicted = predict.load_species_predictions(csvFilename, filterTime=0, threshold=threshold, scoresFilename=npyFilename) #, endTime=1000) # Skip if not moved within 5 minutes
+    else:
+        predicted = predict.load_predictions(csvFilename, filterTime=0, threshold=threshold, scoresFilename=npyFilename) #, endTime=1000) # Skip if not moved within 5 minutes
     totPredictions, totFilteredPredictions = predict.getPredictions()
     total = len(predicted)
     startid = 0
-
-    #clas.makeprediction(im, ooi1)
 
     iterCount = 0
     firstTime = 1
@@ -87,16 +89,16 @@ def run(imgPath, dirName, csvPath, trapName='', useFeatureVector=True):
         
         if firstTime == 1:
             firstTime = 0
-            count, ooi1 = predict.findboxes(file, predicted)
+            count, ooi1 = predict.findboxes(file, predicted, useSpeciesPredictions)
             for oi in ooi1:
                 oi.id = startid
                 startid = startid + 1            
         
-        count2, ooi2 = predict.findboxes(file, predicted)
+        count2, ooi2 = predict.findboxes(file, predicted, useSpeciesPredictions)
+            
         if count2 > 0:
             goods, startid = tr.track_boxes(ooi1, ooi2, count2, startid)
             ooi1 = goods
-            #clas.makeprediction(im, goods)
             tracks.save(insect, goods)
             stat.update_stats(goods, file)
             #print(stat.count)
@@ -126,7 +128,8 @@ def run(imgPath, dirName, csvPath, trapName='', useFeatureVector=True):
 def print_totals(date, stat, resultdir):
     record = str(date) + ','
     for spec in stat.species:
-        print(spec, stat.count[spec])
+        if stat.count[spec] > 0:
+            print(spec, stat.count[spec])
         record += str(stat.count[spec]) + ','
     print('Total', stat.count['total'])
     record += str(stat.count['total']) + '\n'
@@ -154,9 +157,9 @@ def print_totals(date, stat, resultdir):
 def trackInsectsOH3():
 
     dirNames = [ 
-                '20220808', 
-                '20220721', 
-                '20220722', 
+                #'20220808', 
+                #'20220721', 
+                #'20220722', 
                 '20220723'
                 ]
     
@@ -191,12 +194,22 @@ def trackInsects(imgPath, csvPath, trapName):
 if __name__ == '__main__':
 
     print('STARTING NOW. Please wait.....')
-    trackInsectsOH3()
     
+    # Tracking detections with only order classification
+    # useSpeciesPredictions = False
+    # trackInsectsOH3()
     # trapNames = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3', 'SS4']
     # #trapNames = ['LV4']
     # for trapName in trapNames:
     #     csvPath = './CSV/M2022/' + trapName + '/'
     #     imgPath = 'O:/Tech_TTH-KBE/MAVJF/data/2022/' + trapName + '/'
     #     trackInsects(imgPath, csvPath, trapName)
+
+    # Tracking detections with oder and species classification
+    #trapNames = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3', 'SS4']
+    trapNames = ['LV2']
+    for trapName in trapNames:
+        csvPath = './CSV/M2022S/' + trapName + '/'
+        imgPath = 'O:/Tech_TTH-KBE/MAVJF/data/2022/' + trapName + '/'
+        trackInsects(imgPath, csvPath, trapName)
 
