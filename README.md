@@ -21,6 +21,9 @@ orderAndSpeciesClassifier.py - combined order and species classifier
 
 resnet50.py - model used for order classifier 
 
+saved_resnet_128 - contains ResNet50 model weights for oder classifier and thresholds with order labels
+
+
 ## Training and testing insect detector model ##
 
 ### YOLOv5 object detector files ###
