@@ -711,9 +711,11 @@ if __name__=='__main__':
     #create_movie('./movies/OH3_20220723.avi', path, predictions)
 
     # Order and species classifier
-    path = 'O:/Tech_TTH-KBE/MAVJF/data/2022/snapLV2/'
-    predictions = load_species_predictions('./CSV/M2022S/snapLV2.csv')
-    create_movie('./movies/snapLV2.avi', path, predictions)
+    traps = ["LV1", "LV3", "LV4"]
+    for trap in traps:
+        path = 'O:/Tech_TTH-KBE/MAVJF/data/2022/snap' + trap +'/'
+        predictions = load_species_predictions('./CSV/M2022S/snap' + trap +'.csv')
+        create_movie('./movies/snap' + trap + '.avi', path, predictions)
     
     #totalPredictions50 = areaScatterPlots(path, system_name, '0510-22', filterTime=15, show_scatter=False, make_movie=False)
     # predictions = "./Moths"
