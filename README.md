@@ -7,7 +7,7 @@ condaInstall.sh - edit file to install conda environment
 
 # Python source code files, configuration, models and scripts
 
-## Insect order and species classifier files:
+## Insect order and species classifier files
 ami - -species classifier models
 common - species classifier code
 ml - species classifier code
@@ -17,29 +17,29 @@ resnet50.py - model used for order classifier
 
 # Training and testing insect detector model
 
-## YOLOv5 object detector files:
+## YOLOv5 object detector files
 data - YOLO configuration yaml files
 models - YOLO yaml models and code
 utils - YOLO source code
 
-## Training YOLOv5 insect detector:
+## Training YOLOv5 insect detector
 trainF1.py
 trainInsectsMoths.sh
 
-## Validate YOLOv5 insect detector:
+## Validate YOLOv5 insect detector
 val.py
 testInsectsMoths.sh
 
 # Detecting, classifying and tracing insects
 
-## Combined YOLOv5 detection, ResNet50 order and species classifier:
+## Combined YOLOv5 detection, ResNet50 order and species classifier
 detectClassifyInsects.py - Detector and order classifier
 detectClassifySpecies.py - Detector, order and species classifier
 CSV - contains CSV files with detections and npy files with features
 Content of *.csv files which contain lines for each detection (YYYYMMDD.csv):
 	year,trap,date,time,detectConf,detectId,x1,y1,x2,y2,fileName,orderLabel,orderId,orderConf,aboveTH,key,speciesLabel,speciesId,speciesConf
 
-## Insect tracing:
+## Insect tracing
 trackInsects.py - performs tracing of insects based on CSV files generated from combined YOLOv5 detector and ResNet50 classifier
 ITC_config.json - configuration file for insect tracking
 idac - source files used for insect tracking
