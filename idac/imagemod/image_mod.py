@@ -15,9 +15,9 @@ class Imagemod:
             if remainer == 2:
                 color = (150, 75, 0) # Brown
             
-            if oi.label == "Lepidoptera Macros":
+            if oi.order == "Lepidoptera Macros":
                 color = (0, 255, 0) # Green
-            if oi.label == "Lepidoptera Micros":
+            if oi.order == "Lepidoptera Micros":
                 color = (0, 0, 255) # Blue
                 
             if oi.valid == False:
