@@ -29,7 +29,7 @@ labelNamesPlot = ["Araneae", "Coleoptera", "Diptera Brachycera", "Diptera Nemato
 labelNames = ["Lepidoptera Macros", "Lepidoptera Micros"]
 
 config_filename = './ITC_config.json'
-trackPath = "./tracks/"
+trackPath = "./tracks/tracks_order/"
 csvPath = "./CSV/M2022/"
 
 class timedate:
@@ -600,7 +600,7 @@ def analyseAbundanceSampleTime(trap, labelNames, countsTh, percentageTh, resultF
         plt.suptitle(subtitle)
         #plt.tight_layout(pad=1.0)
         plt.savefig(resultFileName + "_" + labelName + ".png")
-        plt.show() 
+        #plt.show() 
         
         labelCorrelations[labelName] = sampleTimesCorrelation
         
@@ -612,7 +612,7 @@ def analyseSampleTime(countsTh, percentageTH):
 
     #traps = ['OH2', 'LV2', 'SS2']  
     #traps = ['OH4', 'LV4', 'SS4']  
-    traps =['OH2']
+    traps =['LV1', 'SS1', 'OH1', 'LV3', 'SS3', 'OH3']
     for trap in traps:
         resultFileName = "./results/sampletimes/" + trap 
         labelNames =  ["Lepidoptera Macros"] #, "Lepidoptera Micros"]
