@@ -107,7 +107,7 @@ def load_predictions(filename, selection = 'All', filterTime=0, threshold=[50,50
     lastObjects = []
     for line in range(lines):
         subsplit = splitted[line].split(',')
-        if len(subsplit) == 15: # required 15 or 16 data values
+        if len(subsplit) == 16: # required 15 or 16 data values
             imgname = subsplit[10]
             imgpath = imgname.split('/')
             prob = subsplit[13] # 4
@@ -127,27 +127,30 @@ def load_predictions(filename, selection = 'All', filterTime=0, threshold=[50,50
                 if yc < 0: yc = 0
                 
                 record = {
-                'system': subsplit[0], # 1-5
-                'camera': subsplit[1], # 0 or 1
-                'date' : subsplit[2],
-                'time' : subsplit[3],
-                'prob' : prob, # Class probability 0-100%
-                'class' : objClass, # Classes 1-16
-                'className' : subsplit[11],
-                'valid' : subsplit[14] == 'True',
-                #'id' : int(subsplit[15]), # Index to predictions
-                # Box position and size
-                'x1' : x1,
-                'y1' : y1,
-                'x2' : x2,
-                'y2' : y2,
-                'xc' : xc,
-                'yc' : yc,
-                'w' : width,
-                'h' : height,
-                'path' : imgname,
-                'image' : imgpath[3],
-                'label' : 0} # Class label (Unknown = 0)
+                        'system': subsplit[0], # 1-5
+                        'camera': subsplit[1], # 0 or 1
+                        'date' : subsplit[2],
+                        'time' : subsplit[3],
+                        'prob' : prob, # Class probability 0-100%
+                        'class' : objClass, # Classes 1-16
+                        'className' : subsplit[11],
+                        'valid' : subsplit[14] == 'True',
+                        #'id' : int(subsplit[15]), # Index to predictions
+                        # Box position and size
+                        'confSpecies' : prob, 
+                        'classSpecies' : objClass,
+                        'speciesName' : subsplit[11],
+                        'x1' : x1,
+                        'y1' : y1,
+                        'x2' : x2,
+                        'y2' : y2,
+                        'xc' : xc,
+                        'yc' : yc,
+                        'w' : width,
+                        'h' : height,
+                        'path' : imgname,
+                        'image' : imgpath[3],
+                        'label' : 0} # Class label (Unknown = 0)
                 
                 lastObjects, newObject =  filter_prediction(lastObjects, record, filterTime)
                 if newObject:
@@ -155,6 +158,100 @@ def load_predictions(filename, selection = 'All', filterTime=0, threshold=[50,50
             
     return foundObjects
 
+# Load prediction CSV file with header, oder and moth species classifications
+# filterTime specifies in minutes how long time window used
+# to decide if predictions belongs to the same object
+# probability threshold for each class, default above 50%
+def load_species_predictions(filename, selection = 'All', filterTime=0, threshold=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], scoresFilename=None):
+    
+    if scoresFilename is None:
+        predictScores = None
+    else:
+        predictScores = np.load(scoresFilename, allow_pickle=True)
+ 
+    file = open(filename, 'r')
+    content = file.read()
+    file.close()
+    splitted = content.split('\n')
+    lines = len(splitted)
+    foundObjects = []
+    lastObjects = []
+    first=True
+    for line in range(lines):
+        subsplit = splitted[line].split(',')
+        if first:
+            if len(subsplit) != 19:
+                print("Wrong header in CSV file", line)
+            first = False
+            continue # Skip first line 
+        if len(subsplit) == 19: # required 19 data values
+            imgname = subsplit[10]
+            imgpath = imgname.split('/')
+            orderClassName = subsplit[11]
+            prob = float(subsplit[13]) # 4
+            objClass = int(subsplit[12])+1 # 5
+            speciesName = subsplit[16] # Moth species for Lepidoptera Macros and Micros
+            classSpecies = int(subsplit[17])
+            confSpecies = float(subsplit[18]) # Confidence of species classifier
+
+            #prob = int(subsplit[4])
+            #objClass = int(subsplit[5])
+            # Check selection 
+            if (selection == imgpath[0] or selection == 'All') and prob >= threshold[objClass-1]:
+                x1 = int(subsplit[6])
+                y1 = int(subsplit[7])
+                x2 = int(subsplit[8])
+                y2 = int(subsplit[9])
+                # Convert points of box to YOLO format: center point and w/h
+                width = x2-x1
+                height = y2-y1
+                xc = x1 - round(width/2)
+                if xc < 0: xc = 0
+                yc = y1 - round(height/2)
+                if yc < 0: yc = 0
+                key = int(subsplit[15]) # Index to prediction scores
+                if predictScores is None:
+                    scores = None
+                else:
+                    scores = predictScores[key]
+                
+                record = {
+                        'system': subsplit[0], # 1-5
+                        'camera': subsplit[1], # 0 or 1
+                        'date' : int(subsplit[2]),
+                        'time' : int(subsplit[3]),
+                        'timeRec' : int(subsplit[3]),
+                        # Oder classification
+                        'prob' : prob, # Class probability 0-100%
+                        'class' : objClass, # Order classes 0-15
+                        'className' : orderClassName,
+                        'valid' : subsplit[14] == 'True',
+                        'key' : key, # Index to predictions
+                        'scores' : scores,
+                        # Species classification
+                        'confSpecies' : confSpecies, # Confidence score of species classification
+                        'classSpecies' : classSpecies, # Moth species ID classified
+                        'speciesName' : speciesName, # Moth species name
+                        # Box position and size
+                        'x1' : x1,
+                        'y1' : y1,
+                        'x2' : x2,
+                        'y2' : y2,
+                        'xc' : xc,
+                        'yc' : yc,
+                        'w' : width,
+                        'h' : height,
+                        'image' : imgpath[3],
+                        'pathimage' : subsplit[10],
+                        'label' : 0} # Class label (Unknown = 0)
+                                            
+                lastObjects, newObject = filter_prediction(lastObjects, record, filterTime)
+                if newObject:
+                    foundObjects.append(record)                      
+            
+    return foundObjects    
+
+    
 def countPredictClasses(predictions):
     countClasses = []
     for i in range(len(labelNames)):
@@ -186,6 +283,7 @@ def write_to_movie(movie_writer, image_dic, predictions, dim):
                 img = cv2.imread(image_dic+filename)
                 for insect in objects:
                     
+                    confidence = insect['prob']
                     classNameSplit = insect['className'].split(' ')
                     if len(classNameSplit) == 2:
                         className = classNameSplit[1]
@@ -195,14 +293,20 @@ def write_to_movie(movie_writer, image_dic, predictions, dim):
                     color = (0,255,255) # Yellow
                     if className == 'Macros':
                         color = (0,255,0) # Green
+                        if 'Macros' not in insect['speciesName']:
+                            className = insect['speciesName']
+                            confidence = insect['confSpecies']
                     if className == 'Micros':
                         color = (255,0,0) # Blue
+                        if 'Micros' not in insect['speciesName']:
+                            className = insect['speciesName']
+                            confidence = insect['confSpecies']
                         
                     if insect['valid'] == False:
                         color = (0,0,255) # Red
                     
                     cv2.rectangle(img,(insect['x1'],insect['y1']-10),(insect['x2'],insect['y2']), color, 4)
-                    insectName = className + ' (' + str(insect['prob'])+ ')'
+                    insectName = className + ' (' + str(confidence)+ ')'
                     y = int(round(insect['y1']-20))
                     cv2.putText(img, insectName, (insect['x1'],y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,0), 2, cv2.LINE_AA)
 
@@ -600,9 +704,16 @@ if __name__=='__main__':
     #path = 'O:/Tech_TTH-KBE/MAVJF/Annotations/2022/dataset3/'
     #predictions = load_predictions('./Moths/dataset3.csv')
     #create_movie('./movies/dataset3.avi', path, predictions)
-    path = 'O:/Tech_TTH-KBE/MAVJF/data/2022/OH3/20220723/'
-    predictions = load_predictions('./Moths/20220723.csv')
-    create_movie('./movies/OH3_20220723.avi', path, predictions)
+   
+    # Order classifier
+    #path = 'O:/Tech_TTH-KBE/MAVJF/data/2022/OH3/20220723/'
+    #predictions = load_predictions('./CSV/M2022/20220723.csv')
+    #create_movie('./movies/OH3_20220723.avi', path, predictions)
+
+    # Order and species classifier
+    path = 'O:/Tech_TTH-KBE/MAVJF/data/2022/snapLV2/'
+    predictions = load_species_predictions('./CSV/M2022S/snapLV2.csv')
+    create_movie('./movies/snapLV2.avi', path, predictions)
     
     #totalPredictions50 = areaScatterPlots(path, system_name, '0510-22', filterTime=15, show_scatter=False, make_movie=False)
     # predictions = "./Moths"
