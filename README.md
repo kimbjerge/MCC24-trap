@@ -9,7 +9,7 @@ condaInstall.sh - edit file to install conda environment
 ## Python source code files, configuration, models and scripts ##
 
 ### Insect order and species classifier files ###
-ami - -species classifier models
+ami - species classifier models
 
 common - species classifier code
 
@@ -33,7 +33,7 @@ trainF1.py
 
 trainInsectsMoths.sh
 
-## Validate YOLOv5 insect detector
+### Validate YOLOv5 insect detector ###
 val.py
 
 testInsectsMoths.sh
@@ -44,6 +44,8 @@ testInsectsMoths.sh
 detectClassifyInsects.py - Detector and order classifier
 
 detectClassifySpecies.py - Detector, order and species classifier
+
+insectMoths-bestF1-1280m6.pt - YOLOv5m6 model trained to detect insects
 
 CSV - contains CSV files with detections and npy files with features
 
