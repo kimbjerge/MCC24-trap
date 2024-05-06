@@ -48,7 +48,7 @@ from utils.general import (LOGGER, check_file, check_img_size, check_imshow, che
 from utils.plots import Annotator, colors, save_one_box
 from utils.torch_utils import select_device, time_sync
 
-from oderAndSpeciesClassifier import orderSpeciesClassifier
+from orderAndSpeciesClassifier import orderSpeciesClassifier
 
 # Functions used to create and write detection and classification results to CSV file
 def createCSVFile(fileName):
@@ -358,8 +358,8 @@ def parse_opt():
     parser.add_argument('--hide-conf', default=False, action='store_true', help='hide confidences')
     parser.add_argument('--half', action='store_true', help='use FP16 half-precision inference')
     parser.add_argument('--dnn', action='store_true', help='use OpenCV DNN for ONNX inference')
-    parser.add_argument('--order-model', type=str, default='./saved_resnet_128/dhc_best.pth', help='Resnet weights for oder classifier')
-    parser.add_argument('--order-labels', type=str, default='./saved_resnet_128/thresholdsTestTrain.csv', help='CSV file with labels and thresholds')
+    parser.add_argument('--order-model', type=str, default='./model_order_060524/dhc_best_128.pth', help='Resnet weights for oder classifier')
+    parser.add_argument('--order-labels', type=str, default='./model_order_060524/thresholdsTestTrain.csv', help='CSV file with labels and thresholds')
     parser.add_argument('--species-model', type=str, default='./ami', help='Path to save and load AMI moth species classifier')
     parser.add_argument('--result', type=str, default='resultMoths', help='Result file name for CSV and NPY files')
     opt = parser.parse_args()

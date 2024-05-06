@@ -48,7 +48,7 @@ from utils.general import (LOGGER, check_file, check_img_size, check_imshow, che
 from utils.plots import Annotator, colors, save_one_box
 from utils.torch_utils import select_device, time_sync
 
-from oderClassifier import orderClassifier
+from orderClassifier import orderClassifier
 
 def appendToCSV(orderClass, img, srcpath, name, imsize, cls, x, y, w, h, conf):
 
@@ -349,8 +349,8 @@ def parse_opt():
     parser.add_argument('--hide-conf', default=False, action='store_true', help='hide confidences')
     parser.add_argument('--half', action='store_true', help='use FP16 half-precision inference')
     parser.add_argument('--dnn', action='store_true', help='use OpenCV DNN for ONNX inference')
-    parser.add_argument('--resnet', type=str, default='./saved_resnet_128/dhc_best.pth', help='Resnet weights for oder classifier')
-    parser.add_argument('--labels', type=str, default='./saved_resnet_128/thresholdsTestTrain.csv', help='CSV file with labels and thresholds')
+    parser.add_argument('--resnet', type=str, default='./model_order_060524/dhc_best_128.pth', help='Resnet weights for oder classifier')
+    parser.add_argument('--labels', type=str, default='./model_order_060524/thresholdsTestTrain.csv', help='CSV file with labels and thresholds')
     parser.add_argument('--result', type=str, default='resultMoths', help='Result file name for CSV and NPY files')
     opt = parser.parse_args()
     opt.imgsz *= 2 if len(opt.imgsz) == 1 else 1  # expand
