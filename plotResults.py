@@ -634,10 +634,10 @@ def analyseSnapFiles(traps):
     for trap in traps:
         predict = loadSnapFiles(trap)    
         predicted += predict
-    # csvPath = "./CSV/M2023S/"
-    # for trap in traps:
-    #     predict = loadSnapFiles(trap)    
-    #     predicted += predict
+    csvPath = "./CSV/M2023S/"
+    for trap in traps:
+        predict = loadSnapFiles(trap)    
+        predicted += predict
     
     aboveThreshold = 0
     numMothSpecies = 0
@@ -645,15 +645,25 @@ def analyseSnapFiles(traps):
     for pred in predicted:
         if pred['valid']:
             aboveThreshold += 1
-            if "Lepidoptera" in pred['className']:
+            if "Lepidoptera" in pred['className'] and pred['confSpecies'] >= 50: # Mila species accuracy 85%
                 species = pred['speciesName']
                 numMothSpecies += 1
                 if species in mothSpecies.keys():
                     mothSpecies[species] += 1
                 else:
                     mothSpecies[species] = 1
+    
+    mothSpeciesSorted = sorted(mothSpecies.values(),reverse=True)               
+    plt.plot(mothSpeciesSorted)
+    mothSpeciesSortedMore = [i for i in mothSpeciesSorted if i > 9]
+    plt.plot(mothSpeciesSortedMore)    
+    plt.title("Abundance of moth species")
+    plt.xlabel("Species id")
+    plt.ylabel("Oberservations")
+    plt.legend(["All species", ">9 species"], loc ="upper right") 
+    plt.show()
                     
-    print("Number of detections", len(predicted), "species", len(mothSpecies), numMothSpecies, "above threshold", aboveThreshold, (aboveThreshold/len(predicted))*100)
+    print("Number of detections", len(predicted), "species", len(mothSpecies), len(mothSpeciesSortedMore), numMothSpecies, "above threshold", aboveThreshold, (aboveThreshold/len(predicted))*100)
     
 
     # %% Insect plots
