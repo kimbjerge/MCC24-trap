@@ -160,7 +160,12 @@ def loadSnapFiles(trap):
     predict = Predictions(conf)
     trackSnapFile = csvPath + "snap" + trap + ".csv"
     threshold=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    predicted = predict.load_predictions(trackSnapFile, filterTime=0, threshold=threshold)
+    if "S" in csvPath:
+        print("Load order and species predictions", trackSnapFile)
+        predicted = predict.load_species_predictions(trackSnapFile, filterTime=0, threshold=threshold)
+    else:
+        print("Load order predictions", trackSnapFile)
+        predicted = predict.load_predictions(trackSnapFile, filterTime=0, threshold=threshold)
     
     return predicted
 
@@ -620,6 +625,35 @@ def analyseSampleTime(countsTh, percentageTH):
         print(trap, trapCorrelations)
         dstNpyfile = resultFileName+".npy"
         np.save(dstNpyfile, trapCorrelations, allow_pickle=True) 
+ 
+def analyseSnapFiles(traps):
+    global csvPath
+    
+    predicted = []
+    csvPath = "./CSV/M2022S/"
+    for trap in traps:
+        predict = loadSnapFiles(trap)    
+        predicted += predict
+    # csvPath = "./CSV/M2023S/"
+    # for trap in traps:
+    #     predict = loadSnapFiles(trap)    
+    #     predicted += predict
+    
+    aboveThreshold = 0
+    numMothSpecies = 0
+    mothSpecies = {}
+    for pred in predicted:
+        if pred['valid']:
+            aboveThreshold += 1
+            if "Lepidoptera" in pred['className']:
+                species = pred['speciesName']
+                numMothSpecies += 1
+                if species in mothSpecies.keys():
+                    mothSpecies[species] += 1
+                else:
+                    mothSpecies[species] = 1
+                    
+    print("Number of detections", len(predicted), "species", len(mothSpecies), numMothSpecies, "above threshold", aboveThreshold, (aboveThreshold/len(predicted))*100)
     
 
     # %% Insect plots
@@ -630,7 +664,7 @@ if __name__ == '__main__':
     
     # %% tíme-lapse sample times vs. motion tracks
     
-    analyseSampleTime(countsTh, percentageTh)
+    #analyseSampleTime(countsTh, percentageTh)
     
     
     plt.rcParams.update({'font.size': 14})
@@ -639,6 +673,8 @@ if __name__ == '__main__':
     #plotAbundanceSelectedClasses(countsTh, percentageTh)
     
     traps = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3', 'SS4']
+    analyseSnapFiles(traps)
+    
     #for trap in traps:
     #    plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundance/" + trap +"_Abundance.png")
     #for trap in traps:
