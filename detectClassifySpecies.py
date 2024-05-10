@@ -193,6 +193,9 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
     vid_path, vid_writer = [None] * bs, [None] * bs
 
     # Run inference
+    numImages = 0
+    numDetections = 0
+    tStart = time_sync()
     keyIdx = 0
     predictionsList = []
     model.warmup(imgsz=(1, 3, *imgsz), half=half)  # warmup
@@ -203,6 +206,7 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
             print("Skipped empty image", s)
             continue
 
+        numImages += 1
         t1 = time_sync()
         im = torch.from_numpy(im).to(device)
         im = im.half() if half else im.float()  # uint8 to fp16/32
@@ -260,6 +264,7 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
                     im0size = im0.shape
                     line = appendToCSV(orderSpeciesClass, im0, source, filename, im0size, cls, *xywh, conf)
                     csvLines.append(line)
+                    numDetections += 1
                     
                     if save_txt:  # Write to file
                         line = (cls, *xywh, conf) if save_conf else (cls, *xywh)  # label format
@@ -319,6 +324,10 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
     dstNpyfile = result + '.npy'
     np.save(dstNpyfile, predictionsList) 
     print("Predictions and keys saved in file", dstNpyfile)
+    tEnd = time_sync()
+    tDuration = tEnd - tStart
+    tAverage = tDuration/numImages
+    LOGGER.info(f"Total images {numImages:d}, detections {numDetections:d} processed in {tDuration:.3f} sec with an average of {tAverage:.3f} sec/image")
  
     # Print results
     t = tuple(x / seen * 1E3 for x in dt)  # speeds per image
