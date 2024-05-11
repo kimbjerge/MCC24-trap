@@ -9,4 +9,5 @@ python -m pip install scikit-learn
 python -m pip install matplotlib
 python -m pip install timm
 python -m pip install sqlalchemy
+python -m pip install scikit-image
 
