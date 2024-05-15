@@ -60,7 +60,7 @@
       "maximages": -1,
       "resultdir": "./tracks",
       "writeimages": false,
-      "writemovie": true,
+      "writemovie": false,
       "moviesize": false,
       "fps":5
    },

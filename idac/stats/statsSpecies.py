@@ -61,11 +61,17 @@ class Stats:
             obj.boxsizehist.append(obj.w*obj.h)
 
     def label_select(self, obj):
+
+        if obj.label not in self.species: # KBE??? Check if label in species list
+            print("Unknown class ", obj.label)
+            obj.label = 'unknown'
+
         if obj.label == 'unknown':
             weight = 0.5
         else:
             weight = 1
-        index = self.species.index(obj.label)
+            
+        index = self.species.index(obj.label)                      
         self.idhistory[obj.id][1][index] += weight
         index = np.argmax(self.idhistory[obj.id][1])
         obj.label = self.species[index]

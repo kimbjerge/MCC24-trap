@@ -24,7 +24,8 @@ from idac.predictions.predictions import Predictions
 
 config_filename = './ITC_config.json'
 
-useSpeciesPredictions=True
+useNewPredictionsFormat=True # New format with species predictions
+useSpeciesPredictions=False
 if useSpeciesPredictions:
     from idac.stats.statsSpecies import Stats
 else:    
@@ -64,9 +65,9 @@ def run(imgPath, dirName, csvPath, trapName='', useFeatureVector=True):
     else:
         npyFilename = None
     threshold=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    if useSpeciesPredictions:
+    if useNewPredictionsFormat: # New format with species predictions
         predicted = predict.load_species_predictions(csvFilename, filterTime=0, threshold=threshold, scoresFilename=npyFilename) #, endTime=1000) # Skip if not moved within 5 minutes
-    else:
+    else: # Old format without species predictions
         predicted = predict.load_predictions(csvFilename, filterTime=0, threshold=threshold, scoresFilename=npyFilename) #, endTime=1000) # Skip if not moved within 5 minutes
     totPredictions, totFilteredPredictions = predict.getPredictions()
     total = len(predicted)
@@ -206,10 +207,14 @@ if __name__ == '__main__':
     #     trackInsects(imgPath, csvPath, trapName)
 
     # Tracking detections with oder and species classification
-    #trapNames = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3', 'SS4']
-    trapNames = ['LV2']
+    #
+    trapNames = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3', 'SS4']
+    #trapNames = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4']
+    #trapNames = ['OH3']
     for trapName in trapNames:
         csvPath = './CSV/M2022S/' + trapName + '/'
         imgPath = 'O:/Tech_TTH-KBE/MAVJF/data/2022/' + trapName + '/'
+        #csvPath = './M2022S/' + trapName + '/'
+        #imgPath = '/mnt/Dfs/Tech_TTH-KBE/MAVJF/data/2022/' + trapName + '/'
         trackInsects(imgPath, csvPath, trapName)
 
