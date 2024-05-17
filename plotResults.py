@@ -29,8 +29,10 @@ labelNamesPlot = ["Araneae", "Coleoptera", "Diptera Brachycera", "Diptera Nemato
 labelNames = ["Lepidoptera Macros", "Lepidoptera Micros"]
 
 config_filename = './ITC_config.json'
-trackPath = "./tracks/tracks_order/"
-csvPath = "./CSV/M2022/"
+#trackPath = "./tracks/tracks_order/"
+#csvPath = "./CSV/M2022/"
+trackPath = "./tracks/"
+csvPath = "./CSV/M2022S/"
 
 class timedate:
     
@@ -518,7 +520,12 @@ def loadSimulatedSnapFiles(trap, sampleTime=10):
         if csvFile.endswith('.csv'):
             predictionFile = predictionsTrapPath + csvFile
             print(predictionFile)
-            predicted = predict.load_predictions(predictionFile, filterTime=0, threshold=threshold)
+            if "S" in csvPath:
+                print("Load order and species predictions", predictionFile)
+                predicted = predict.load_species_predictions(predictionFile, filterTime=0, threshold=threshold)
+            else:
+                print("Load order predictions", predictionFile)
+                predicted = predict.load_predictions(predictionFile, filterTime=0, threshold=threshold)
             predictedSelect = predict.select_predictions(predicted, sampleTime)
             allPredictions += predictedSelect
         
@@ -589,7 +596,8 @@ def analyseAbundanceSampleTime(trap, labelNames, countsTh, percentageTh, resultF
             ax.plot(dayOfYear, abundanceTL, label=labelText, color="black")
             
             #title += "  " + td.strMonthDay(dateList[0]) + '-' + td.strMonthDay((dateList[-1])) + r"  $\rho$=" + str(correlation)
-            title = "  TL=" + td.formatTime(sampleTime) + r" $\rho$=" + str(correlation) + " cs=" + str(cosine)
+            #title = "  TL=" + td.formatTime(sampleTime) + r" $\rho$=" + str(correlation) + " cs=" + str(cosine)
+            title = "  TL=" + td.formatTime(sampleTime) + r" $\rho$=" + str(correlation) 
             ax.set_title(title)
             if idxFig in [1, 9]: #15
                 ax.legend()  
@@ -616,8 +624,9 @@ def analyseSampleTime(countsTh, percentageTH):
     plt.rcParams.update({'font.size': 12})
 
     #traps = ['OH2', 'LV2', 'SS2']  
-    #traps = ['OH4', 'LV4', 'SS4']  
-    traps =['LV1', 'SS1', 'OH1', 'LV3', 'SS3', 'OH3']
+    traps = ['OH4', 'LV4', 'SS4']  
+    #traps =['LV1', 'SS1', 'OH1', 'LV3', 'SS3', 'OH3']
+    traps = ['OH3']
     for trap in traps:
         resultFileName = "./results/sampletimes/" + trap 
         labelNames =  ["Lepidoptera Macros"] #, "Lepidoptera Micros"]
@@ -674,7 +683,7 @@ if __name__ == '__main__':
     
     # %% tíme-lapse sample times vs. motion tracks
     
-    #analyseSampleTime(countsTh, percentageTh)
+    analyseSampleTime(countsTh, percentageTh)
     
     
     plt.rcParams.update({'font.size': 14})
@@ -683,7 +692,7 @@ if __name__ == '__main__':
     #plotAbundanceSelectedClasses(countsTh, percentageTh)
     
     traps = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3', 'SS4']
-    analyseSnapFiles(traps)
+    #analyseSnapFiles(traps)
     
     #for trap in traps:
     #    plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundance/" + trap +"_Abundance.png")
