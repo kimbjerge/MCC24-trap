@@ -433,9 +433,9 @@ def plotAbundanceAllClasses(trap, countsTh, percentageTh, resultFileName, useSna
     for labelName in labelNamesPlot:
 
         if "ax" in locals():
-            ax = figure.add_subplot(3, 5, idxFig, sharex = ax) #, sharey = ax) 
+            ax = figure.add_subplot(5, 3, idxFig, sharex = ax) #, sharey = ax) 
         else:
-            ax = figure.add_subplot(3, 5, idxFig) 
+            ax = figure.add_subplot(5, 3, idxFig) 
              
         title = labelName
         colorIdx = 0
@@ -763,8 +763,8 @@ if __name__ == '__main__':
     traps = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3', 'SS4']
     #analyseSnapFiles(traps)
     
-    #for trap in traps:
-    #    plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundance/" + trap +"_Abundance.png")
+    for trap in traps:
+        plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundance/" + trap +"_Abundance.png")
     #for trap in traps:
     #    plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundanceSnap/" + trap +"_Abundance.png", useSnapImages=True)
     
@@ -776,7 +776,7 @@ if __name__ == '__main__':
     #plotTimeHistogramsSelectedTrap(traps, countsTh, percentageTh, "OH")
     #traps = ['LV1', 'LV2', 'LV3', 'LV4']
     traps = ['LV2', 'SS1']
-    plotTimeHistogramsSelectedTrapAllClasses(traps, countsTh, percentageTh)
+    #plotTimeHistogramsSelectedTrapAllClasses(traps, countsTh, percentageTh)
     
     
     
