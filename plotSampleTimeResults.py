@@ -5,6 +5,7 @@ Created on Wed Apr 17 13:35:12 2024
 @author: Kim Bjerge
 """
 import os
+import math
 import matplotlib.pyplot as plt
 import numpy as np
 from pprint import pprint
@@ -68,8 +69,8 @@ def plotSampleTimeCorrelationTraps(trapsCorr, labelNames, resultFileName, usePea
    
     colors = ["green", "blue", "purple", 
               "olive", "cyan", "brown", 
-              "pink",  "orange", "red", 
-              "yellow", "grey", "black", 
+              "pink",  "orange", "blue", 
+              "green", "grey", "black", 
               "olive", "cyan", "brown"]
 
     idxFig = 1
@@ -92,6 +93,7 @@ def plotSampleTimeCorrelationTraps(trapsCorr, labelNames, resultFileName, usePea
         sumDays = 0
         correlationAllTraps = []
         abundanceAllTraps = []
+        correlationAllTimes = []
         for trap, trapCorrelations in trapsCorr:
                
             print(trap, labelName)
@@ -116,6 +118,8 @@ def plotSampleTimeCorrelationTraps(trapsCorr, labelNames, resultFileName, usePea
                     avgInsectsTL = round(record[id_abundanceTL]/record[id_numDays]*100)/100
                     abundanceAllTraps.append(avgInsectsTL)
             
+            if not any([math.isnan(c) for c in correlations]):
+                correlationAllTimes.append(correlations)
             maxCorr = max(correlations)
             idxMaxCorr = correlations.index(maxCorr)
             bestSampleTimes.append(sampleTimes[idxMaxCorr])
@@ -140,22 +144,25 @@ def plotSampleTimeCorrelationTraps(trapsCorr, labelNames, resultFileName, usePea
             if useSampleTimes:
                 
                 if usePearson:
-                    ax.plot(plotSampleTimes, correlations, label=labelText, color=colors[colorIdx], marker=".")
+                    #ax.plot(plotSampleTimes, correlations, label=labelText, color=colors[colorIdx], marker=".")
+                    ax.scatter(plotSampleTimes, correlations, label=labelText, color=colors[colorIdx], marker="o")
                 else:
                     ax.plot(plotSampleTimes, cosines, label=labelText, color=colors[colorIdx], marker=".")
-                ax.scatter(plotSampleTimes[idxMaxCorr], maxCorr, color="black", marker="s")
+                #ax.scatter(plotSampleTimes[idxMaxCorr], maxCorr, color="black", marker="s")
                 colorIdx += 1
                 titleColor = "green"
-                if avgInsectsTraps < 20:
+                if avgInsectsTraps < 50:
                     titleColor = "blue"
-                if avgInsectsTraps < 3:
+                if avgInsectsTraps < 10:
                     titleColor = "red"
                                     
                 ax.set_title(labelName + " (" + str(avgInsectsTraps) + ")", color=titleColor)
                 #if idxFig == 1:
                 #ax.legend(loc='lower right')
                 #ax.set_xscale('log')
-                ax.set_xlim(0,20)
+                ax.set_xlim(0,30)
+                ax.set_xscale('log')
+                ax.set_ylim(0,1)
                 if idxFig in [13, 14, 15]: 
                     ax.set_xlabel('Interval (minutes)')
                 if idxFig in [1, 4, 7, 10, 13]: 
@@ -164,13 +171,17 @@ def plotSampleTimeCorrelationTraps(trapsCorr, labelNames, resultFileName, usePea
                     else:
                         ax.set_ylabel('Cosine similarity')
 
-        if not useSampleTimes:
+        if useSampleTimes:
+            
+            ax.plot(plotSampleTimes, np.mean(correlationAllTimes, axis=0), label="", color="red", marker=".")
+        
+        else:
             
             ax.scatter(abundanceAllTraps, correlationAllTraps, color="black")
             titleColor = "green"
-            if avgInsectsTraps < 20:
+            if avgInsectsTraps < 50:
                 titleColor = "blue"
-            if avgInsectsTraps < 3:
+            if avgInsectsTraps < 10:
                 titleColor = "red"
                                 
             ax.set_title(labelName + " (" + str(avgInsectsTraps) + ")", color=titleColor)
@@ -243,8 +254,8 @@ if __name__ == '__main__':
     figure.tight_layout(pad=1.0)
     ax = figure.add_subplot(1, 1, 1) 
     ax.stem(sampleTimes, numTestSampleTimes)
-    plt.text(1, 40, "10s", fontsize = 14)
-    plt.text(3, 25, "2m", fontsize = 14)
+    #plt.text(1, 40, "10s", fontsize = 14)
+    #plt.text(3, 25, "2m", fontsize = 14)
 
     ax.set_title("Frequency of best TL sampling intervals")
     ax.set_xlabel("Interval (minutes)")

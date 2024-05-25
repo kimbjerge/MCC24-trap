@@ -246,6 +246,69 @@ def plotTimeHistograms(traps, trackPath, countsTh, percentageTh, labelNames, res
     plt.savefig("./results/" + resultFileName)
     plt.show() 
 
+
+def plotTimeHistogramsAllClasses(traps, trackPath, countsTh, percentageTh, labelNames, resultFileName):
+    
+    td = timedate()
+    
+    for trap in traps:
+        
+        dateList, dayOfYear, selDataset2 = loadTrackFiles(trap, countsTh, percentageTh)
+
+        idxFig = 1
+        figure = plt.figure(figsize=(12,12))
+        figure.tight_layout(pad=1.0)
+     
+        subtitle = trap
+        labels = ""
+        #colors = ["green", "blue", "orange", "brown"]
+        for labelName in labelNames:
+
+            if "ax" in locals():
+                ax = figure.add_subplot(5, 3, idxFig, sharex = ax, sharey = ax) 
+            else:
+                ax = figure.add_subplot(5, 3, idxFig)     
+
+            selDataset = selDataset2.loc[selDataset2['class'] == labelName]
+            print(trap, labelName, len(selDataset))
+            durations, allDurations = getDurationList(selDataset, maxLimit=1500)
+            
+            labelText = labelName 
+            ax.hist(durations, bins=150, label=labelText, color="orange")
+            ax.plot()
+            
+            averageDuration = int(round(np.mean(allDurations)))
+            print("Average duration", averageDuration)
+            steps = 20
+            step = 3000/steps
+            listPb = [step*i for i in range(steps)]            
+            listAvgD = [averageDuration for i in range(steps)]
+            plt.plot(listAvgD, listPb, 'k')
+            plt.text(200, 400, "Avg " + str(averageDuration), fontsize = 14)
+
+            labels += ' ' + labelName
+            
+            #title += " (" + td.strMonthDay(dateList[0]) + '-' + td.strMonthDay((dateList[-1])) + ")"
+            title = labelName
+            ax.set_title(title)
+            ax.set_xlim(0, 1200)
+            #if idxFig in [1, 15]:
+                #ax.legend()
+            
+            ax.set_yscale('log')
+            if idxFig in [13, 14, 15]: 
+                ax.set_xlabel('Seconds')
+            if idxFig in [1, 4, 7, 10, 13]:
+                ax.set_ylabel('Frequency')
+            
+            idxFig += 1        
+    
+        plt.suptitle(subtitle)
+        plt.tight_layout(pad=1.0)
+        plt.savefig("./results/" + trap+resultFileName)
+        plt.show() 
+
+
 def plotSnapAbundance(traps, trackPath, csvPath, countsTh, percentageTh, labelNames, resultFileName, colorOffset=0):
     
     td = timedate()
@@ -282,6 +345,7 @@ def plotSnapAbundance(traps, trackPath, csvPath, countsTh, percentageTh, labelNa
             labelText = labelName + ' (track)'
             ax.plot(dayOfYear, abundance, label=labelText, color=colors[colorIdx+colorOffset])
             labelText = labelName + ' (TL)'
+            print(labelText, abundanceSnap)
             ax.plot(dayOfYear, abundanceSnap, label=labelText, color=colorsSnap[colorIdx+colorOffset])
             labels += ' ' + labelName
             colorIdx += 1
@@ -353,7 +417,7 @@ def plotAbundanceAllClasses(trap, countsTh, percentageTh, resultFileName, useSna
 
     figure = plt.figure(figsize=(20,20))
     figure.tight_layout(pad=1.0)
-    plt.rcParams.update({'font.size': 18})
+    plt.rcParams.update({'font.size': 16})
  
     trackFiles = trackPath + trap + '/'
     
@@ -369,9 +433,9 @@ def plotAbundanceAllClasses(trap, countsTh, percentageTh, resultFileName, useSna
     for labelName in labelNamesPlot:
 
         if "ax" in locals():
-            ax = figure.add_subplot(5, 3, idxFig, sharex = ax) #, sharey = ax) 
+            ax = figure.add_subplot(3, 5, idxFig, sharex = ax) #, sharey = ax) 
         else:
-            ax = figure.add_subplot(5, 3, idxFig) 
+            ax = figure.add_subplot(3, 5, idxFig) 
              
         title = labelName
         colorIdx = 0
@@ -494,7 +558,6 @@ def plotTracksVsSnap(countsTh, percentageTh):
     
 def plotTimeHistogramsSelectedTrap(traps, trapscountsTh, percentageTh, name):
 
-    traps = ['OH1', 'OH2', 'OH3', 'OH4']
     labelNames =  ["Lepidoptera Macros"]
     plotTimeHistograms(traps, trackPath, 2, 50, labelNames, name + "_LepidopteraMacros_TimeHist.png", "green")
     labelNames =  ["Lepidoptera Micros"]
@@ -505,8 +568,13 @@ def plotTimeHistogramsSelectedTrap(traps, trapscountsTh, percentageTh, name):
     plotTimeHistograms(traps, trackPath, 2, 50, labelNames, name + "_Trichoptera_TimeHist.png", "brown")
     #labelNames =  ["Hymenoptera Vespidae"]
     #traps = ['SS1', 'SS2', 'SS3', 'SS4']
-    plotTimeHistograms(traps, trackPath, 2, 50, labelNames, "SS_Vespidae_TimeHist.png", "orange")
+    #plotTimeHistograms(traps, trackPath, 2, 50, labelNames, "SS_Vespidae_TimeHist.png", "orange")
 
+def plotTimeHistogramsSelectedTrapAllClasses(traps, trapscountsTh, percentageTh):
+
+    plotTimeHistogramsAllClasses(traps, trackPath, 2, 50, labelNamesPlot, "_AllInsects_TimeHist.png")
+    
+    
 def loadSimulatedSnapFiles(trap, sampleTime=10):
     
     conf = readconfig(config_filename)
@@ -624,9 +692,10 @@ def analyseSampleTime(countsTh, percentageTH):
     plt.rcParams.update({'font.size': 12})
 
     #traps = ['OH2', 'LV2', 'SS2']  
-    traps = ['OH4', 'LV4', 'SS4']  
-    #traps =['LV1', 'SS1', 'OH1', 'LV3', 'SS3', 'OH3']
-    traps = ['OH3']
+    #traps = ['OH4', 'LV4', 'SS4']  
+    #traps = ['LV1', 'SS1', 'OH1'] 
+    traps = ['LV3', 'SS3', 'OH3']
+    #traps = ['OH3']
     for trap in traps:
         resultFileName = "./results/sampletimes/" + trap 
         labelNames =  ["Lepidoptera Macros"] #, "Lepidoptera Micros"]
@@ -683,7 +752,7 @@ if __name__ == '__main__':
     
     # %% tíme-lapse sample times vs. motion tracks
     
-    analyseSampleTime(countsTh, percentageTh)
+    #analyseSampleTime(countsTh, percentageTh)
     
     
     plt.rcParams.update({'font.size': 14})
@@ -705,7 +774,9 @@ if __name__ == '__main__':
     # %% Time histogram plots
     traps = ['OH1', 'OH2', 'OH3', 'OH4']
     #plotTimeHistogramsSelectedTrap(traps, countsTh, percentageTh, "OH")
-    
+    #traps = ['LV1', 'LV2', 'LV3', 'LV4']
+    traps = ['LV2', 'SS1']
+    plotTimeHistogramsSelectedTrapAllClasses(traps, countsTh, percentageTh)
     
     
     

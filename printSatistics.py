@@ -37,7 +37,8 @@ def countPredictions(predictions):
         
 def printPredictionStatistics(trapNames, predict):
     
-    predictionsPath = "./CSV/M2022/"
+    #predictionsPath = "./CSV/M2022/"
+    predictionsPath = "./CSV/M2022S/"
     fileCntTotal = 0
     predictionCntTotal = 0
     predictionAboveTotal = 0
@@ -50,8 +51,14 @@ def printPredictionStatistics(trapNames, predict):
         predictionAboveTrap = 0
         nightsTrap = 0
         for predictionFile in sorted(os.listdir(predictionPath)):
-            if predictionFile.endswith('.csv'):        
-                predicted = predict.load_predictions(predictionPath+predictionFile, filterTime=0, threshold=thresholds)
+            if predictionFile.endswith('.csv'):   
+                if "S/" in predictionsPath:
+                    #print("Load order and species predictions", predictionPath)
+                    predicted = predict.load_species_predictions(predictionPath+predictionFile, filterTime=0, threshold=thresholds)
+                else:
+                    #print("Load order predictions", predictionPath)
+                    predicted = predict.load_predictions(predictionPath+predictionFile, filterTime=0, threshold=thresholds)
+                    
                 filesCnt, predictionCnt, predictionAbove, predictionBelow = countPredictions(predicted)
                 nightsTrap += 1
                 fileCntTrap += filesCnt
@@ -69,14 +76,21 @@ def printPredictionStatistics(trapNames, predict):
 
 def printPredictionSnapStatistics(trapNames, predict):
     
-    predictionsPath = "./CSV/M2022/"
+    #predictionsPath = "./CSV/M2022/"
+    predictionsPath = "./CSV/M2022S/"
     fileCntTotal = 0
     predictionCntTotal = 0
     predictionAboveTotal = 0
     for trap in trapNames:
         predictionPath = predictionsPath + 'snap' + trap + '.csv'
         
-        predicted = predict.load_predictions(predictionPath, filterTime=0, threshold=thresholds)
+        if "S/" in predictionsPath:
+            #print("Load order and species predictions", predictionPath)
+            predicted = predict.load_species_predictions(predictionPath, filterTime=0, threshold=thresholds)
+        else:
+            #print("Load order predictions", predictionPath)
+            predicted = predict.load_predictions(predictionPath, filterTime=0, threshold=thresholds)
+            
         fileCntTrap, predictionCntTrap, predictionAboveTrap, predictionBelowTrap = countPredictions(predicted)
         fileCntTotal += fileCntTrap
         predictionCntTotal += predictionCntTrap
@@ -89,10 +103,12 @@ def printPredictionSnapStatistics(trapNames, predict):
 
 def printTrackStatistics(trapNames, countsTh, percentageTh):
     
-    trackPath = "./tracks/tracks_order/"
+    #trackPath = "./tracks/tracks_order/"
+    trackPath = "./tracks/"
     
     tracksTotal = 0
     tracksValidTotal = 0
+    detectionsInValidTracksTotal = 0
     for trap in trapNames:
         trackFiles = trackPath + trap + '/'
         dataframes = []
@@ -106,11 +122,13 @@ def printTrackStatistics(trapNames, countsTh, percentageTh):
         selDataset1 = dataset.loc[dataset['percentage'] > percentageTh]
         selDataset2 = selDataset1.loc[selDataset1['counts'] >= countsTh]
         tracksValidTrap = len(selDataset2)
-        print(trap, tracksTrap, tracksValidTrap, 100*tracksValidTrap/tracksTrap)
+        detectionsInValidTracks = selDataset2['counts'].values.sum() + tracksValidTrap
+        print(trap, detectionsInValidTracks, tracksTrap, tracksValidTrap, 100*tracksValidTrap/tracksTrap)
         tracksTotal += tracksTrap
         tracksValidTotal += tracksValidTrap
+        detectionsInValidTracksTotal += detectionsInValidTracks
         
-    print("Tracks total", tracksTotal, "valid", tracksValidTotal, "pecentage valid", 100*tracksValidTotal/tracksTotal)
+    print("Detections in valid tracks", detectionsInValidTracksTotal, "Tracks total", tracksTotal, "valid", tracksValidTotal, "pecentage valid", 100*tracksValidTotal/tracksTotal)
     
         
 #%% MAIN
@@ -121,7 +139,7 @@ if __name__=='__main__':
     
     trapNames = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3', 'SS4']
     
-    #printPredictionStatistics(trapNames, predict)
+    printPredictionStatistics(trapNames, predict)
     #printPredictionSnapStatistics(trapNames, predict)
     printTrackStatistics(trapNames, 2, 50)
     
