@@ -250,6 +250,7 @@ if __name__ == '__main__':
             time = time/60
         sampleTimes.append(time)
     
+    plt.rcParams.update({'font.size': 16})
     figure = plt.figure(figsize=(8,8))
     figure.tight_layout(pad=1.0)
     ax = figure.add_subplot(1, 1, 1) 
