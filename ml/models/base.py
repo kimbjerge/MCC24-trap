@@ -160,7 +160,8 @@ class InferenceBaseClass:
                 Taxon IDs are helpful for looking up additional information about the species
                 such as the genus and family.
                 """
-                from trapdata.ml.utils import replace_gbif_id_with_name
+                #KBE??? from trapdata.ml.utils import replace_gbif_id_with_name
+                from ml.utils import replace_gbif_id_with_name
 
                 string_labels = {}
                 for label, index in labels.items():

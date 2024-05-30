@@ -34,7 +34,10 @@ class orderSpeciesClassifier:
         self.device = device
 
         # Load the AMI moth species classifier model, create model with image_size = 128 (Fixed in code)
+        # Uncomment the model you like to use for your region of interrest
         self.speciesModel = speciesClassifier.UKDenmarkMothSpeciesClassifierMixedResolution(speciesModelPath, "")
+        #self.speciesModel = speciesClassifier.QuebecVermontMothSpeciesClassifierMixedResolution(speciesModelPath, "")
+        #self.speciesModel = speciesClassifier.PanamaMothSpeciesClassifierMixedResolution2023(speciesModelPath, "") # 1036 classes of species
     
         num_classes=len(self.labels)
         print("Order classifier uses ResNet50 and load weights with num. classes", num_classes)
