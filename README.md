@@ -4,7 +4,8 @@ This project contains python code for processing time-lapse and motion images fr
 ## Python environment files ##
 envreq.txt - environment requierments
 
-condaInstall.sh - edit file to install conda environment
+condaInstall.sh - edit file to install conda environment on Linux
+raspberryInstall.sh - bash script to install python environment on RaspberryPi 4 and 5
 
 ## Python source code files, configuration, models and scripts ##
 
