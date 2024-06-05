@@ -8,11 +8,12 @@ condaInstall.sh - edit file to install conda environment on Linux
 
 raspberryInstall.sh - bash script to install Python environment on RaspberryPi 4 and 5
 
-## Images used for testing - one night of four hours recording with high activity of insects (>6,000 image)
+## Python source code files, configuration, models and scripts ##
+
+### Images used for testing - one night of four hours recording with high activity of insects (>6,000 image)
 
 https://drive.google.com/file/d/17ABGAg3b7hmxW4DbfI7wwZp4iU_PpbAB/view?usp=drive_link
 
-## Python source code files, configuration, models and scripts ##
 
 ### Insect order and species classifier files ###
 ami - species classifier models
