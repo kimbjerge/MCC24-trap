@@ -1,12 +1,12 @@
 # MCC24-trap #
-This project contains python code for processing time-lapse and motion images from the AMI traps (detection, classification and tracking)
+This project contains Python code for processing time-lapse and motion images from the AMI traps (detection, classification and tracking)
 
 ## Python environment files ##
 envreq.txt - environment requierments
 
 condaInstall.sh - edit file to install conda environment on Linux
 
-raspberryInstall.sh - bash script to install python environment on RaspberryPi 4 and 5
+raspberryInstall.sh - bash script to install Python environment on RaspberryPi 4 and 5
 
 ## Python source code files, configuration, models and scripts ##
 
@@ -23,7 +23,7 @@ orderAndSpeciesClassifier.py - combined order and species classifier
 
 resnet50.py - model used for order classifier 
 
-saved_resnet_128 - contains ResNet50 model weights for oder classifier and thresholds with order labels
+model_order_100524 - contains the newest ResNet50 model weights for oder classifier and thresholds with order labels
 
 
 ## Training and testing insect detector model ##
