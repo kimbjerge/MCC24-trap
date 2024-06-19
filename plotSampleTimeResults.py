@@ -255,9 +255,10 @@ if __name__ == '__main__':
                 plotSampleTimeCorrelation(trap, trapCorrelations, labelNamesPlot3)
     
     
-    bestSampleTimes, testSampleTimes, testSampleSeconds, numTestSampleTimes, numDiffSampleTimes = plotSampleTimeCorrelationTraps(trapsCorr, labelNamesPlot, "sampleTimeCorrelation2sec.png", useSampleTimes=False, simSampleTime=10)
+    bestSampleTimes, testSampleTimes, testSampleSeconds, numTestSampleTimes, numDiffSampleTimes = plotSampleTimeCorrelationTraps(trapsCorr, labelNamesPlot, "sampleTimeCorrelation2min.png", useSampleTimes=False, simSampleTime=200)
     bestSampleTimes, testSampleTimes, testSampleSeconds, numTestSampleTimes, numDiffSampleTimes = plotSampleTimeCorrelationTraps(trapsCorr, labelNamesPlot, "sampleTimeCorrelation10min.png", useSampleTimes=False, simSampleTime=1000)
-    bestSampleTimes, testSampleTimes, testSampleSeconds, numTestSampleTimes, numDiffSampleTimes = plotSampleTimeCorrelationTraps(trapsCorr, labelNamesPlot, "sampleTimePearsonCorrelation.png", usePearson=False)
+    bestSampleTimes, testSampleTimes, testSampleSeconds, numTestSampleTimes, numDiffSampleTimes = plotSampleTimeCorrelationTraps(trapsCorr, labelNamesPlot, "sampleTimePearsonCorrelation.png", usePearson=True)
+    bestSampleTimes, testSampleTimes, testSampleSeconds, numTestSampleTimes, numDiffSampleTimes = plotSampleTimeCorrelationTraps(trapsCorr, labelNamesPlot, "sampleTimeMeanAbsDifference.png", usePearson=False)
     
     print(bestSampleTimes)
     #plt.hist(bestSampleTimes, bins=250)
