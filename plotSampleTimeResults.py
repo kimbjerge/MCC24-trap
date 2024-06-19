@@ -26,7 +26,7 @@ id_numDays = 1
 id_abundanceTrack = 2
 id_abundanceTL = 3
 id_correlation = 4
-id_cosine = 5
+id_cosine = 5 # Could also be avgSumAbsDiff
 
 def plotSampleTimeCorrelation(trap, trapCorrelations, labelNames):
     
@@ -75,9 +75,11 @@ def plotSampleTimeCorrelationTraps(trapsCorr, labelNames, resultFileName, usePea
 
     idxFig = 1
     bestSampleTimes = []
+    minAvgSumAbsDiffTimes = []
     testSampleTimes = [10, 30, 100, 200, 500, 1000, 1500, 2000, 3000]
     testSampleSeconds = [10, 30, 60, 120, 300, 600, 900, 1200, 1800]
     numTestSampleTimes =[0, 0,   0,   0,   0,    0,    0,    0,    0]
+    numDiffSampleTimes =[0, 0,   0,   0,   0,    0,    0,    0,    0]
     for labelName in labelNames:
    
         if "ax" in locals():
@@ -94,6 +96,7 @@ def plotSampleTimeCorrelationTraps(trapsCorr, labelNames, resultFileName, usePea
         correlationAllTraps = []
         abundanceAllTraps = []
         correlationAllTimes = []
+        differenceAllTimes = []
         for trap, trapCorrelations in trapsCorr:
                
             print(trap, labelName)
@@ -118,6 +121,8 @@ def plotSampleTimeCorrelationTraps(trapsCorr, labelNames, resultFileName, usePea
                     avgInsectsTL = round(record[id_abundanceTL]/record[id_numDays]*100)/100
                     abundanceAllTraps.append(avgInsectsTL)
             
+            if not any([math.isnan(c) for c in cosines]):
+                differenceAllTimes.append(cosines)
             if not any([math.isnan(c) for c in correlations]):
                 correlationAllTimes.append(correlations)
             maxCorr = max(correlations)
@@ -126,6 +131,12 @@ def plotSampleTimeCorrelationTraps(trapsCorr, labelNames, resultFileName, usePea
             idx = testSampleTimes.index(sampleTimes[idxMaxCorr])
             numTestSampleTimes[idx] += 1
             avgInsectsTraps = round((sumInsects/sumDays)*10)/10
+            
+            minError = min(cosines) # avgSumAbsDiff
+            idxMinError = cosines.index(minError)
+            minAvgSumAbsDiffTimes.append(sampleTimes[idxMinError])
+            idx = testSampleTimes.index(sampleTimes[idxMinError])
+            numDiffSampleTimes[idx] += 1      
             
             #sampleTimes = [time/100 for time in sampleTimes]
             plotSampleTimes = []
@@ -146,8 +157,10 @@ def plotSampleTimeCorrelationTraps(trapsCorr, labelNames, resultFileName, usePea
                 if usePearson:
                     #ax.plot(plotSampleTimes, correlations, label=labelText, color=colors[colorIdx], marker=".")
                     ax.scatter(plotSampleTimes, correlations, label=labelText, color=colors[colorIdx], marker="o")
+                    ax.set_ylim(0,1)
                 else:
-                    ax.plot(plotSampleTimes, cosines, label=labelText, color=colors[colorIdx], marker=".")
+                    ax.scatter(plotSampleTimes, cosines, label=labelText, color=colors[colorIdx], marker="o")
+                    ax.set_yscale('log')
                 #ax.scatter(plotSampleTimes[idxMaxCorr], maxCorr, color="black", marker="s")
                 colorIdx += 1
                 titleColor = "green"
@@ -162,19 +175,22 @@ def plotSampleTimeCorrelationTraps(trapsCorr, labelNames, resultFileName, usePea
                 #ax.set_xscale('log')
                 ax.set_xlim(0,30)
                 ax.set_xscale('log')
-                ax.set_ylim(0,1)
                 if idxFig in [13, 14, 15]: 
                     ax.set_xlabel('Interval (minutes)')
                 if idxFig in [1, 4, 7, 10, 13]: 
                     if usePearson:
                         ax.set_ylabel('Pearson correlation')
                     else:
-                        ax.set_ylabel('Cosine similarity')
+                        #ax.set_ylabel('Cosine similarity')
+                        ax.set_ylabel('Difference')
 
         if useSampleTimes:
             
-            ax.plot(plotSampleTimes, np.mean(correlationAllTimes, axis=0), label="", color="red", marker=".")
-        
+            if usePearson:
+                ax.plot(plotSampleTimes, np.mean(correlationAllTimes, axis=0), label="", color="red", marker=".")
+            else:
+                ax.plot(plotSampleTimes, np.mean(differenceAllTimes, axis=0), label="", color="red", marker=".")
+                
         else:
             
             ax.scatter(abundanceAllTraps, correlationAllTraps, color="black")
@@ -192,13 +208,18 @@ def plotSampleTimeCorrelationTraps(trapsCorr, labelNames, resultFileName, usePea
                 if usePearson:
                     ax.set_ylabel('Pearson correlation')
                 else:
-                    ax.set_ylabel('Cosine similarity')
+                    #ax.set_ylabel('Cosine similarity')
+                    ax.set_ylabel('Difference')
             
             
         idxFig += 1
         
     if useSampleTimes:
-        plt.suptitle("Correlation of tracks vs. TL sampling intervals for all traps")
+        if usePearson:
+            plt.suptitle("Correlation of tracks vs. TL sampling intervals for all traps")
+        else:
+            plt.suptitle("Difference of tracking vs. TL sampling for all traps")
+            
     else:
         if simSampleTime < 60:
             plt.suptitle("Correlation vs. average detections for all traps (TL " + str(int(simSampleTime%100)) +" sec)")
@@ -210,7 +231,7 @@ def plotSampleTimeCorrelationTraps(trapsCorr, labelNames, resultFileName, usePea
     plt.show() 
 
     plt.rcParams.update({'font.size': 12})
-    return bestSampleTimes, testSampleTimes, testSampleSeconds, numTestSampleTimes
+    return bestSampleTimes, testSampleTimes, testSampleSeconds, numTestSampleTimes, numDiffSampleTimes
 
     # %% Insect plots
 if __name__ == '__main__':
@@ -234,9 +255,9 @@ if __name__ == '__main__':
                 plotSampleTimeCorrelation(trap, trapCorrelations, labelNamesPlot3)
     
     
-    bestSampleTimes, testSampleTimes, testSampleSeconds, numTestSampleTimes = plotSampleTimeCorrelationTraps(trapsCorr, labelNamesPlot, "sampleTimeCorrelation2sec.png", useSampleTimes=False, simSampleTime=10)
-    bestSampleTimes, testSampleTimes, testSampleSeconds, numTestSampleTimes = plotSampleTimeCorrelationTraps(trapsCorr, labelNamesPlot, "sampleTimeCorrelation10min.png", useSampleTimes=False, simSampleTime=1000)
-    bestSampleTimes, testSampleTimes, testSampleSeconds, numTestSampleTimes = plotSampleTimeCorrelationTraps(trapsCorr, labelNamesPlot, "sampleTimePearsonCorrelation.png", usePearson=True)
+    bestSampleTimes, testSampleTimes, testSampleSeconds, numTestSampleTimes, numDiffSampleTimes = plotSampleTimeCorrelationTraps(trapsCorr, labelNamesPlot, "sampleTimeCorrelation2sec.png", useSampleTimes=False, simSampleTime=10)
+    bestSampleTimes, testSampleTimes, testSampleSeconds, numTestSampleTimes, numDiffSampleTimes = plotSampleTimeCorrelationTraps(trapsCorr, labelNamesPlot, "sampleTimeCorrelation10min.png", useSampleTimes=False, simSampleTime=1000)
+    bestSampleTimes, testSampleTimes, testSampleSeconds, numTestSampleTimes, numDiffSampleTimes = plotSampleTimeCorrelationTraps(trapsCorr, labelNamesPlot, "sampleTimePearsonCorrelation.png", usePearson=False)
     
     print(bestSampleTimes)
     #plt.hist(bestSampleTimes, bins=250)
@@ -251,16 +272,25 @@ if __name__ == '__main__':
         sampleTimes.append(time)
     
     plt.rcParams.update({'font.size': 16})
-    figure = plt.figure(figsize=(8,8))
+    figure = plt.figure(figsize=(14,8))
     figure.tight_layout(pad=1.0)
-    ax = figure.add_subplot(1, 1, 1) 
+    ax = figure.add_subplot(1, 2, 1) 
     ax.stem(sampleTimes, numTestSampleTimes)
     #plt.text(1, 40, "10s", fontsize = 14)
     #plt.text(3, 25, "2m", fontsize = 14)
 
-    ax.set_title("Frequency of best TL sampling intervals")
-    ax.set_xlabel("Interval (minutes)")
+    ax.set_title("Best correlation")
+    ax.set_xlabel("TL interval (minutes)")
     ax.set_ylabel("Frequency")
+
+    ax = figure.add_subplot(1, 2, 2) 
+    ax.stem(sampleTimes, numDiffSampleTimes)
+    #plt.text(1, 40, "10s", fontsize = 14)
+    #plt.text(3, 25, "2m", fontsize = 14)
+
+    ax.set_title("Minimum difference")
+    ax.set_xlabel("TL interval (minutes)")
+    #ax.set_ylabel("Frequency")
     plt.show()
     
     

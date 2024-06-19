@@ -653,10 +653,17 @@ def analyseAbundanceSampleTime(trap, labelNames, countsTh, percentageTh, resultF
             
             correlation, _ = pearsonr(abundanceTrack, abundanceTL)
             correlation = np.round(correlation * 10000)/10000
-            cosine = np.dot(abundanceTrack,abundanceTL)/(norm(abundanceTrack)*norm(abundanceTL))
-            cosine = np.round(cosine * 10000)/10000
-            print(trap, labelName, len(dayOfYear),  sum(abundanceTrack), sum(abundanceTL), sampleTime, correlation, cosine)
-            sampleTimesCorrelation.append([sampleTime, len(dayOfYear), sum(abundanceTrack), sum(abundanceTL), correlation, cosine])
+            absDiff = [np.abs(xi - yi) for xi, yi in zip(abundanceTL, abundanceTrack)]
+            avgSumAbsDiff = np.sum(absDiff)/len(absDiff)
+            avgSumAbsDiff = np.round(avgSumAbsDiff*100)/100
+            print(trap, labelName, len(dayOfYear),  sum(abundanceTrack), sum(abundanceTL), sampleTime, correlation, avgSumAbsDiff)
+            sampleTimesCorrelation.append([sampleTime, len(dayOfYear), sum(abundanceTrack), sum(abundanceTL), correlation, avgSumAbsDiff])
+            
+            # Claculating cosine similarity nearly equal to pearson correlation
+            #cosine = np.dot(abundanceTrack,abundanceTL)/(norm(abundanceTrack)*norm(abundanceTL))
+            #cosine = np.round(cosine * 10000)/10000
+            #print(trap, labelName, len(dayOfYear),  sum(abundanceTrack), sum(abundanceTL), sampleTime, correlation, cosine)
+            #sampleTimesCorrelation.append([sampleTime, len(dayOfYear), sum(abundanceTrack), sum(abundanceTL), correlation, cosine])
     
             labelText = labelName + ' (track)'
             ax.plot(dayOfYear, abundanceTrack, label=labelText, color="red")
@@ -693,8 +700,8 @@ def analyseSampleTime(countsTh, percentageTH):
 
     #traps = ['OH2', 'LV2', 'SS2']  
     #traps = ['OH4', 'LV4', 'SS4']  
-    #traps = ['LV1', 'SS1', 'OH1'] 
-    traps = ['LV3', 'SS3', 'OH3']
+    traps = ['LV1', 'SS1', 'OH1'] 
+    #traps = ['LV3', 'SS3', 'OH3']
     #traps = ['OH3']
     for trap in traps:
         resultFileName = "./results/sampletimes/" + trap 
@@ -752,7 +759,7 @@ if __name__ == '__main__':
     
     # %% tíme-lapse sample times vs. motion tracks
     
-    #analyseSampleTime(countsTh, percentageTh)
+    analyseSampleTime(countsTh, percentageTh)
     
     
     plt.rcParams.update({'font.size': 14})
@@ -763,8 +770,8 @@ if __name__ == '__main__':
     traps = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3', 'SS4']
     #analyseSnapFiles(traps)
     
-    for trap in traps:
-        plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundance/" + trap +"_Abundance.png")
+    #for trap in traps:
+    #    plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundance/" + trap +"_Abundance.png")
     #for trap in traps:
     #    plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundanceSnap/" + trap +"_Abundance.png", useSnapImages=True)
     
