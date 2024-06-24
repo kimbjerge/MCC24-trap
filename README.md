@@ -19,7 +19,8 @@ https://drive.google.com/file/d/17ABGAg3b7hmxW4DbfI7wwZp4iU_PpbAB/view?usp=drive
 
 See annotated video with tracks of classified insects based on the test images:
 
-https://www.youtube.com/watch?v=HzOCYlgnhlE&t=479s
+[![Watch the video]([https://youtu.be/vt5fpE0bzSY](https://www.youtube.com/watch?v=HzOCYlgnhlE&t=479s))]
+
 
 ### YOLOv5 weights for insect detection and localisation (m6 and s6 models)
 
