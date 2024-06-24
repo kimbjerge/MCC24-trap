@@ -10,9 +10,15 @@ raspberryInstall.sh - bash script to install Python environment on RaspberryPi 4
 
 ## Python source code files, configuration, models and scripts ##
 
-### Test images - one night of four hours with high activity of insects (>6,000 image)
+### Test images - one night of four hours with high activity of insects (>6,000 images)
 
 https://drive.google.com/file/d/17ABGAg3b7hmxW4DbfI7wwZp4iU_PpbAB/view?usp=drive_link
+
+### YOLOv5 weights for insect detection and localization (m6 and s6 models)
+
+https://drive.google.com/file/d/12aQpXF7T1YD3PSltI3J5gp4gZ4JQ689A/view?usp=drive_link
+
+The modified YOLOv5 code is an older version of the repository from: https://github.com/ultralytics/yolov5
 
 ### Getting started ###
 
