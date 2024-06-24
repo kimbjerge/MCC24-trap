@@ -39,7 +39,12 @@ The modified YOLOv5 code is an older version of the repository from: https://git
 	python trackInsects.py
 
 ### Insect order and species classifier files ###
-ami - species classifier models
+
+The directories ami, common and ml is code copied and modified from: 
+
+https://github.com/RolnickLab/ami-data-companion
+
+ami - species classifier models 
 
 common - species classifier code
 
