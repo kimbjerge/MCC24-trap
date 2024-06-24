@@ -1,6 +1,8 @@
 # MCC24-trap #
 This project contains Python code for processing time-lapse and motion images from the AMI traps (detection, classification and tracking)
 
+![Alt text](EdgeProcessingNocturalInsects.png)
+
 ## Python environment files ##
 envreq.txt - environment requirements
 
