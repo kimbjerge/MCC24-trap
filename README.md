@@ -26,7 +26,7 @@ The modified YOLOv5 code is an older version of the repository from: https://git
 
    If running on RaspberryPi use the raspberryInstall.sh script.
 
-3. Download and unpack the YOLO weights and test images - see the drive.google.com links above
+3. Download and unpack the YOLOv5 weights and test images - see the drive.google.com links above
    
 4. Run the insect detector and classifiers (Use the *s6.pt or *m6.pt YOLOv5 weights)
 
