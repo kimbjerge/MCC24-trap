@@ -2,7 +2,7 @@
 This project contains Python code for processing time-lapse and motion images from the AMI traps (detection, classification and tracking)
 
 ## Python environment files ##
-envreq.txt - environment requierments
+envreq.txt - environment requirements
 
 condaInstall.sh - edit file to install conda environment on Linux
 
@@ -14,6 +14,19 @@ raspberryInstall.sh - bash script to install Python environment on RaspberryPi 4
 
 https://drive.google.com/file/d/17ABGAg3b7hmxW4DbfI7wwZp4iU_PpbAB/view?usp=drive_link
 
+### Getting started ###
+
+1a. Install the environment requirements (Linux)
+1b. If running on RaspberryPi use the raspberryInstall.sh script.
+
+2. Download and unpack the test images - see the link above
+   
+4. Run the insect detector and classifiers (Use the *s6.pt or *m6.pt YOLOv5 weights)
+   python detectClassifySpecies.py --weights insectMoths-bestF1-1280m6.pt --result results --img 1280 --conf 0.20 --nosave --source <path to test images>
+   
+5. Modify the configuration file for insect tracking: ITC_config.json (set path for results.csv and results.npy)
+6. Run the insect tracker:
+   python trackInsects.py
 
 ### Insect order and species classifier files ###
 ami - species classifier models
@@ -65,7 +78,7 @@ Content of *.csv files which contain lines for each detection (YYYYMMDD.csv):
 
 	year,trap,date,time,detectConf,detectId,x1,y1,x2,y2,fileName,orderLabel,orderId,orderConf,aboveTH,key,speciesLabel,speciesId,speciesConf
 
-### Insect tracing ###
+### Insect tacking ###
 trackInsects.py - performs tracing of insects based on CSV files generated from combined YOLOv5 detector and ResNet50 classifier
 
 ITC_config.json - configuration file for insect tracking
