@@ -25,7 +25,7 @@ from idac.predictions.predictions import Predictions
 config_filename = './ITC_config.json'
 
 useNewPredictionsFormat=True # New format with species predictions
-useSpeciesPredictions=False
+useSpeciesPredictions=True
 if useSpeciesPredictions:
     from idac.stats.statsSpecies import Stats
 else:    
@@ -208,9 +208,11 @@ if __name__ == '__main__':
 
     # Tracking detections with oder and species classification
     #
-    trapNames = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3', 'SS4']
-    #trapNames = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4']
-    #trapNames = ['OH3']
+    #trapNames = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3', 'SS4']
+    #trapNames = ['LV1', 'LV2', 'LV3', 'LV4']
+    #trapNames = ['OH2', 'OH3', 'OH4']
+    #trapNames = ['SS2', 'SS3', 'SS4']
+    trapNames = ['LV2']
     for trapName in trapNames:
         csvPath = './CSV/M2022S/' + trapName + '/'
         imgPath = 'O:/Tech_TTH-KBE/MAVJF/data/2022/' + trapName + '/'
