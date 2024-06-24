@@ -47,7 +47,7 @@ The modified YOLOv5 code is an older version of the repository from: https://git
 
 ### Insect order and species classifier files ###
 
-The directories ami, common and ml is code copied and modified from: 
+The directories ami, common and ml contains code copied and modified from: 
 
 https://github.com/RolnickLab/ami-data-companion
 
