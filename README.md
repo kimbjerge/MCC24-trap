@@ -16,17 +16,21 @@ https://drive.google.com/file/d/17ABGAg3b7hmxW4DbfI7wwZp4iU_PpbAB/view?usp=drive
 
 ### Getting started ###
 
-1a. Install the environment requirements (Linux)
+1a. Install the environment requirements condaInstall.sh (Linux)
+
 1b. If running on RaspberryPi use the raspberryInstall.sh script.
 
 2. Download and unpack the test images - see the link above
    
 4. Run the insect detector and classifiers (Use the *s6.pt or *m6.pt YOLOv5 weights)
-   python detectClassifySpecies.py --weights insectMoths-bestF1-1280m6.pt --result results --img 1280 --conf 0.20 --nosave --source <path to test images>
+
+	python detectClassifySpecies.py --weights insectMoths-bestF1-1280m6.pt --result results --img 1280 --conf 0.20 --nosave --source <path to test images>
    
-5. Modify the configuration file for insect tracking: ITC_config.json (set path for results.csv and results.npy)
-6. Run the insect tracker:
-   python trackInsects.py
+6. Modify the configuration file for insect tracking: ITC_config.json (set path for results.csv and results.npy)
+   
+7. Run the insect tracker:
+
+	python trackInsects.py
 
 ### Insect order and species classifier files ###
 ami - species classifier models
