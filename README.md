@@ -14,7 +14,7 @@ raspberryInstall.sh - bash script to install Python environment on RaspberryPi 4
 
 https://drive.google.com/file/d/17ABGAg3b7hmxW4DbfI7wwZp4iU_PpbAB/view?usp=drive_link
 
-### YOLOv5 weights for insect detection and localization (m6 and s6 models)
+### YOLOv5 weights for insect detection and localisation (m6 and s6 models)
 
 https://drive.google.com/file/d/12aQpXF7T1YD3PSltI3J5gp4gZ4JQ689A/view?usp=drive_link
 
