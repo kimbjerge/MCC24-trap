@@ -32,14 +32,19 @@ The modified YOLOv5 code is an older version of the repository from: https://git
 
 	python detectClassifySpecies.py --weights insectMoths-bestF1-1280m6.pt --result results --img 1280 --conf 0.20 --nosave --source <path to test images>
    
-6. Modify the configuration file for insect tracking: ITC_config.json (set path for results.csv and results.npy)
+6. Modify trackInsects.py and the configuration file for insect tracking: ITC_config.json (set path for results.csv and results.npy)
    
 7. Run the insect tracker:
 
 	python trackInsects.py
 
 ### Insect order and species classifier files ###
-ami - species classifier models
+
+The directories ami, common and ml is code copied and modified from: 
+
+https://github.com/RolnickLab/ami-data-companion
+
+ami - species classifier models 
 
 common - species classifier code
 
@@ -80,7 +85,9 @@ detectClassifyInsects.py - Detector and order classifier
 
 detectClassifySpecies.py - Detector, order and species classifier
 
-insectMoths-bestF1-1280m6.pt - YOLOv5m6 model trained to detect insects
+insectMoths-bestF1-1280m6.pt - YOLOv5m6 medium model trained to detect insects
+
+insectMoths-bestF1-1280s6.pt - YOLOv5s6 small model trained to detect insects
 
 CSV - contains CSV files with detections and npy files with features
 
