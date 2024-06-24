@@ -17,7 +17,7 @@ raspberryInstall.sh - bash script to install Python environment on RaspberryPi 4
 
 https://drive.google.com/file/d/17ABGAg3b7hmxW4DbfI7wwZp4iU_PpbAB/view?usp=drive_link
 
-See annotated video with tracks of classified insects based on the test images:
+See below video with annotated tracks of classified insects (Order/suborder/moth species) based on the test images:
 
 [![Watch the video](InsectImage2.jpg)](https://www.youtube.com/watch?v=HzOCYlgnhlE&t=488s)
 
