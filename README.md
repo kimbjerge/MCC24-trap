@@ -80,7 +80,9 @@ detectClassifyInsects.py - Detector and order classifier
 
 detectClassifySpecies.py - Detector, order and species classifier
 
-insectMoths-bestF1-1280m6.pt - YOLOv5m6 model trained to detect insects
+insectMoths-bestF1-1280m6.pt - YOLOv5m6 medium model trained to detect insects
+
+insectMoths-bestF1-1280s6.pt - YOLOv5s6 small model trained to detect insects
 
 CSV - contains CSV files with detections and npy files with features
 
