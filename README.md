@@ -16,11 +16,10 @@ https://drive.google.com/file/d/17ABGAg3b7hmxW4DbfI7wwZp4iU_PpbAB/view?usp=drive
 
 ### Getting started ###
 
-1a. Install the environment requirements condaInstall.sh (Linux)
+1. Install the environment requirements condaInstall.sh (Linux)
+   If running on RaspberryPi use the raspberryInstall.sh script.
 
-1b. If running on RaspberryPi use the raspberryInstall.sh script.
-
-2. Download and unpack the test images - see the link above
+3. Download and unpack the YOLO weights and test images - see the link above
    
 4. Run the insect detector and classifiers (Use the *s6.pt or *m6.pt YOLOv5 weights)
 
@@ -45,7 +44,7 @@ orderAndSpeciesClassifier.py - combined order and species classifier
 
 resnet50.py - model used for order classifier 
 
-model_order_100524 - contains the newest ResNet50 model weights for oder classifier and thresholds with order labels
+model_order_100524 - contains the newest ResNet50 model weights for order classifier and thresholds with order labels
 
 
 ## Training and testing insect detector model ##
@@ -89,7 +88,7 @@ ITC_config.json - configuration file for insect tracking
 
 idac - source files used for insect tracking
 
-tracks - contatins CSV and JSON files with tracks for every date (YYYMMDD*)
+tracks - contains CSV and JSON files with tracks for every date (YYYMMDD*)
 
 Content of *TR.csv files which contain lines for each track: 
 
