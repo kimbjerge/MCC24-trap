@@ -32,7 +32,7 @@ The modified YOLOv5 code is an older version of the repository from: https://git
 
 	python detectClassifySpecies.py --weights insectMoths-bestF1-1280m6.pt --result results --img 1280 --conf 0.20 --nosave --source <path to test images>
    
-6. Modify the configuration file for insect tracking: ITC_config.json (set path for results.csv and results.npy)
+6. Modify trackInsects.py and the configuration file for insect tracking: ITC_config.json (set path for results.csv and results.npy)
    
 7. Run the insect tracker:
 
