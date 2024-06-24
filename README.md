@@ -24,7 +24,7 @@ The modified YOLOv5 code is an older version of the repository from: https://git
 
 1. Install the environment requirements condaInstall.sh (Linux)
 
-   If running on RaspberryPi use the raspberryInstall.sh script.
+   If running on Raspberry Pi 4 or 5 use the raspberryInstall.sh script.
 
 3. Download and unpack the YOLOv5 weights and test images - see the drive.google.com links above
    
