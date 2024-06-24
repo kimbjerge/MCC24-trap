@@ -17,6 +17,7 @@ https://drive.google.com/file/d/17ABGAg3b7hmxW4DbfI7wwZp4iU_PpbAB/view?usp=drive
 ### Getting started ###
 
 1. Install the environment requirements condaInstall.sh (Linux)
+
    If running on RaspberryPi use the raspberryInstall.sh script.
 
 3. Download and unpack the YOLO weights and test images - see the link above
