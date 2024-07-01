@@ -8,7 +8,7 @@ Created on Mon April  1 08:10:16 2024
 import time
 import os
 import json
-
+import argparse
 from skimage import io
 from idac.configreader.configreader import readconfig
 from idac.datareader.data_reader import DataReader
@@ -192,27 +192,8 @@ def trackInsects(imgPath, csvPath, trapName):
 
     print("Total images", imageCounts, "Total detections", totalPredictions)
 
-if __name__ == '__main__':
-
-    print('STARTING NOW. Please wait.....')
+def trackAllTraps(trapNames):
     
-    # Tracking detections with only order classification
-    # useSpeciesPredictions = False
-    # trackInsectsOH3()
-    # trapNames = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3', 'SS4']
-    # #trapNames = ['LV4']
-    # for trapName in trapNames:
-    #     csvPath = './CSV/M2022/' + trapName + '/'
-    #     imgPath = 'O:/Tech_TTH-KBE/MAVJF/data/2022/' + trapName + '/'
-    #     trackInsects(imgPath, csvPath, trapName)
-
-    # Tracking detections with oder and species classification
-    #
-    #trapNames = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3', 'SS4']
-    #trapNames = ['LV1', 'LV2', 'LV3', 'LV4']
-    #trapNames = ['OH2', 'OH3', 'OH4']
-    #trapNames = ['SS2', 'SS3', 'SS4']
-    trapNames = ['LV2']
     for trapName in trapNames:
         csvPath = './CSV/M2022S/' + trapName + '/'
         imgPath = 'O:/Tech_TTH-KBE/MAVJF/data/2022/' + trapName + '/'
@@ -220,3 +201,49 @@ if __name__ == '__main__':
         #imgPath = '/mnt/Dfs/Tech_TTH-KBE/MAVJF/data/2022/' + trapName + '/'
         trackInsects(imgPath, csvPath, trapName)
 
+def trackInsectsSingleDate(imgPath, csvPath, dateStr):
+    
+    imageCounts = 0
+    totalPredictions = 0
+    for dirNameCSV in os.listdir(csvPath):
+        if dateStr in dirNameCSV and dirNameCSV.endswith('.csv'):
+            dirName = dirNameCSV.split('.')[0]
+            print(csvPath, imgPath, dirName)
+            stat, resultdir, counts, totPred, totFiltered = run(imgPath, dirName, csvPath)
+            totalPredictions += totPred
+            imageCounts += counts
+            date = int(dirName[0:8])  # format YYYYMMDD
+            print_totals(date, stat, resultdir)    
+
+    print("Total images", imageCounts, "Total detections", totalPredictions)
+    
+if __name__ == '__main__':
+
+    print('Tracking insects - see additional parameters in ITC_config.json')
+    print('  Videos and results (*TR.CSV) are saved in directory specified by moviemaker -> resultdir')
+    print('  To enable creating video with bounding boxes and track lines set movimaker -> writemovie:true')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--traps', default='single') # Process data from a 'single' trap or a list of 'multiple' traps
+    parser.add_argument('--species', default=True) # Use order/suborder classifer and moth species classifier if True (False only order/suborder)
+    parser.add_argument('--date', default='20220618') # Set date for tracking - looking for <date>.csv file
+    args = parser.parse_args()
+    print(args)    
+    
+    # Tracking detections with order/suborder and moth species classification
+    useSpeciesPredictions = args.species # If False then only order/suborder classifer is used
+    
+    # Tracking of multiple traps with detections in CSV files for each day
+    if args.traps == 'multiple':
+        trapNames = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3', 'SS4']
+        trackAllTraps(trapNames)
+
+    # Tracking from a single trap with detections in CSV files for a specified day (args.date)
+    if args.traps == 'single':        
+        csvPath = './CSV/M2022S/LV2/' # Set path for where to find detections (CSV file)
+        #imgPath = './images/' # Set path for where to find images - only used if "writemovie": true in ITC_config.json
+        imgPath = 'O:/Tech_TTH-KBE/MAVJF/data/2022/LV2/'
+        time1 = time.time()
+        trackInsectsSingleDate(imgPath, csvPath, args.date)
+        print("Tracking time", time.time()-time1)
+
+    # Old testing trackInsectsOH3()
