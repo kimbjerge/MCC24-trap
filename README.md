@@ -33,7 +33,7 @@ The modified YOLOv5 code is an older version of the repository from: https://git
 
 ### Getting started ###
 
-1. Install the environment requirements condaInstall.sh (Linux)
+1. Install the environment requirements condaInstall.sh (Linux with Anaconda)
 
    If running on Raspberry Pi 4 or 5 use the raspberryInstall.sh script.
 
