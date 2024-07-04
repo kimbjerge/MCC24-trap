@@ -41,7 +41,7 @@ The modified YOLOv5 code is an older version of the repository from: https://git
 
 4. Activate python environment
 
-   - Anaconda: $ conda activate 
+   - Anaconda: $ conda activate PyTorch_AMI
 
    - Rasberry Pi: $ source /home/pi/venv/bin/activate
 
