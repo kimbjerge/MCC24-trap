@@ -32,6 +32,7 @@ https://drive.google.com/file/d/12aQpXF7T1YD3PSltI3J5gp4gZ4JQ689A/view?usp=drive
 The modified YOLOv5 code is an older version of the repository from: https://github.com/ultralytics/yolov5
 
 ### Getting started ###
+The edge computer needs to have internet connection the first time the insect detector and classifier is executed.
 
 1. Install the environment requirements condaInstall.sh (Linux with Anaconda)
 
