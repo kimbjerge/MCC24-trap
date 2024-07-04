@@ -1,6 +1,6 @@
 # MCC24-trap #
 This project contains Python code for processing time-lapse and motion images from the AMI traps (detection, classification and tracking)
-The repository contains Python code for steps 1-4. (The three datasets are not included only the trained models and weights)
+The repository contains Python code for steps 1-4 in figure below. (The three datasets are not included only the trained models and weights)
 
 The work and results are described in the paper: "Towards edge processing of images from insect camera traps"
 https://www.biorxiv.org/content/10.1101/2024.07.01.601488v1
