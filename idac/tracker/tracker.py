@@ -6,7 +6,8 @@ from numpy.linalg import norm
 from scipy.optimize import linear_sum_assignment
 import time
 
-MAX_TRACKS = 400
+#MAX_TRACKS = 500
+MAX_TRACKS = 700
 #IMG_DIAG = 2203  # Diagonal of image  C920 camera with image size 1920x1080
 IMG_DIAG = 4405  # Diagonal of image Brio camera with image size 3840x2160 
 
