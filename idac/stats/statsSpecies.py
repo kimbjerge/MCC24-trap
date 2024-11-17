@@ -88,6 +88,22 @@ class Stats:
         self.details[obj.id] = obj
         obj.distance = distance
 
+    def cleanText(self, text_with_special_chars):
+        
+        # Initialize an empty string to store the cleaned text
+        cleaned_text = ""
+        # Iterate through each character in the input string
+        for char in text_with_special_chars:
+            # Check if the character is alphanumeric (letters or digits)
+            if char.isalnum() or char == ' ' or char == '.' or char == '&':
+                # If alphanumeric or a space, add it to the cleaned text
+                cleaned_text += char
+            else:
+                #print("-------------------------------->Error char statsSpecies", char)
+                cleaned_text += ' ' # Convert special chars to space
+                
+        return cleaned_text
+    
     def writedetails(self, dirname):
         file = open(dirname + 'TR.json', 'w+')
         line = '{\n\"tracks\":[\n'
@@ -132,13 +148,13 @@ class Stats:
                     file.write(',\n')
                     
                 towrite = '{\"id\":' + str(obj.id) + ','  + '\"startdate\":' + obj.startdate + ',' + '\"starttime\":\"' + obj.starttime + '\",' + '\"endtime\":\"' + obj.endtime + '\",' \
-                          + '\"duration\":' + str(int(tdelta_seconds)) + ',' + '\"class\":' + '\"' + obj.label + '\",' \
+                          + '\"duration\":' + str(int(tdelta_seconds)) + ',' + '\"class\":' + '\"' + self.cleanText(obj.label) + '\",' \
                           + '\"counts\":' + str(int(obj.counts)) + ',' + '\"percentage\":' + "%0.2f" % (conf*100) + ',' + '\"size\":' \
                           + "%0.2f" % avg_blob + ',' + '\"distance\":' + str(int(distance)) + '}'
                 file.write(towrite)
                 
                 line = str(obj.id) + ',' + obj.startdate + ',' + obj.starttime + ',' + obj.endtime + ',' + str(int(tdelta_seconds)) + ',' \
-                       + obj.label + ',' + str(int(obj.counts)) + ',' + "%0.2f" % (conf*100) + ','  + "%0.2f" % avg_blob + ',' + str(int(distance)) + '\n'
+                       + self.cleanText(obj.label) + ',' + str(int(obj.counts)) + ',' + "%0.2f" % (conf*100) + ','  + "%0.2f" % avg_blob + ',' + str(int(distance)) + '\n'
                 filecsv.write(line)
 
         line = ']\n}\n'

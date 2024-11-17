@@ -204,7 +204,7 @@ class Predictions:
                         foundObjects.append(record)                      
                 
         return foundObjects    
-
+    
     # Load prediction CSV file with header, oder and moth species classifications
     # filterTime specifies in minutes how long time window used
     # to decide if predictions belongs to the same object
@@ -277,7 +277,7 @@ class Predictions:
                             # Species classification
                             'confSpecies' : confSpecies, # Confidence score of species classification
                             'classSpecies' : classSpecies, # Moth species ID classified
-                            'speciesName' : speciesName, # Moth species name
+                            'speciesName' : speciesName, # Moth species name (Contains invalid UTF 8 characters)
                             # Box position and size
                             'x1' : x1,
                             'y1' : y1,
