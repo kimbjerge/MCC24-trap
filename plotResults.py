@@ -31,8 +31,10 @@ labelNames = ["Lepidoptera Macros", "Lepidoptera Micros"]
 config_filename = './ITC_config.json'
 #trackPath = "./tracks/tracks_order/"
 #csvPath = "./CSV/M2022/"
-trackPath = "./tracks/"
-csvPath = "./CSV/M2022S/"
+#trackPath = "./tracks/"
+#csvPath = "./CSV/M2022S/"
+trackPath = "./tracks_2023/"
+csvPath = "./CSV/M2023S/"
 
 class timedate:
     
@@ -417,7 +419,7 @@ def plotAbundanceAllClasses(trap, countsTh, percentageTh, resultFileName, useSna
 
     figure = plt.figure(figsize=(20,20))
     figure.tight_layout(pad=1.0)
-    plt.rcParams.update({'font.size': 16})
+    plt.rcParams.update({'font.size': 20})
  
     trackFiles = trackPath + trap + '/'
     
@@ -478,7 +480,8 @@ def plotAbundanceAllClasses(trap, countsTh, percentageTh, resultFileName, useSna
             ax.set_yscale('log')
         if idxFig in [13, 14, 15]: 
             ax.set_xlabel('Day of Year')
-        ax.set_xlim(180, 320)
+        #ax.set_xlim(180, 320)
+        ax.set_xlim(dayOfYear[0], dayOfYear[-1]) # NB adjust for days operational
         if idxFig in [1, 4, 7, 10, 13]: 
             if useSnapImages:
                 ax.set_ylabel('Observations')
@@ -488,7 +491,7 @@ def plotAbundanceAllClasses(trap, countsTh, percentageTh, resultFileName, useSna
         idxFig += 1
   
     plt.suptitle(subtitle)
-    plt.tight_layout(pad=1.0)
+    plt.tight_layout(pad=2.0)
     plt.savefig("./results/" + resultFileName)
     plt.show() 
  
@@ -759,7 +762,7 @@ if __name__ == '__main__':
     
     # %% tíme-lapse sample times vs. motion tracks
     
-    analyseSampleTime(countsTh, percentageTh)
+    #analyseSampleTime(countsTh, percentageTh)
     
     
     plt.rcParams.update({'font.size': 14})
@@ -770,8 +773,9 @@ if __name__ == '__main__':
     traps = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3', 'SS4']
     #analyseSnapFiles(traps)
     
-    #for trap in traps:
-    #    plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundance/" + trap +"_Abundance.png")
+    for trap in traps:
+        #plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundance_2022/" + trap +"_Abundance.png")
+        plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundance_2023/" + trap +"_Abundance.png")
     #for trap in traps:
     #    plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundanceSnap/" + trap +"_Abundance.png", useSnapImages=True)
     

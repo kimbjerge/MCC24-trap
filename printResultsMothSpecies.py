@@ -160,23 +160,75 @@ def loadSnapFiles(trap):
     
     return predicted
 
-def plotAbundanceAllClasses(trap, countsTh, percentageTh, resultFileName, useSnapImages=False):
+def findMothSpecies(dataframe, numSpecies):
+    
+    mothSpecies = {}
+    for index, row in dataframe.iterrows():
+        className = row['class']
+        if className not in orderSuborderNames:
+            #print(className)
+            if className in mothSpecies.keys():
+                mothSpecies[className] += 1
+            else:
+                mothSpecies[className] = 1
+    
+    mothSpeciesSorted = dict(sorted(mothSpecies.items(), key=lambda item: item[1], reverse=True))
+    mothSpeciesNames = []
+    for i, key in enumerate(mothSpeciesSorted):
+        mothSpeciesNames.append(key)
+        if i >= numSpecies-1: 
+            break;
+   
+    return mothSpeciesSorted, mothSpeciesNames
 
+def plotMothSpecies(trap, mothSpecies, resultFileName, numSpecies):
+    
     figure = plt.figure(figsize=(20,20))
     figure.tight_layout(pad=1.0)
-    plt.rcParams.update({'font.size': 16})
- 
+    plt.rcParams.update({'font.size': 18})
+    ax = figure.add_subplot(1,1,1)
+    
+    species = []
+    abundance = []
+    for i, key in enumerate(mothSpecies):
+        species.append(key)
+        abundance.append(mothSpecies[key])
+        if i >= numSpecies-1: 
+            break;
+
+    #bar_labels = ['red', 'blue', '_red', 'orange']
+    #bar_colors = ['tab:red', 'tab:blue', 'tab:red', 'tab:orange']
+    
+    ax.barh(species, abundance)
+    
+    ax.set_xlabel('Tracks')
+    ax.set_title('Abundance of moth species ' + trap)
+    #ax.legend(title='Fruit color')
+    plt.tight_layout(pad=2.0)
+    plt.savefig("./results/" + resultFileName + "Barh.png")
+    
+    plt.show()
+        
+def plotAbundanceAllClasses(trap, countsTh, percentageTh, resultFileName, useSnapImages=False):
+
     trackFiles = trackPath + trap + '/'
     
     dateList, dayOfYear, selDataset2 = loadTrackFiles(trap, countsTh, percentageTh)
+    mothSpecies, mothSpeciesNames = findMothSpecies(selDataset2, 15)
+    plotMothSpecies(trap, mothSpecies, resultFileName, numSpecies=30)
   
     td = timedate()
     subtitle = trap + " (" + td.strMonthDay(dateList[0]) + '-' + td.strMonthDay((dateList[-1])) + ")"
  
     if useSnapImages:    
         predicted = loadSnapFiles(trap)
+
+    figure = plt.figure(figsize=(20,20))
+    figure.tight_layout(pad=1.0)
+    plt.rcParams.update({'font.size': 20})
                           
     idxFig = 1
+    labelNamesPlot = mothSpeciesNames 
     for labelName in labelNamesPlot:
 
         if "ax" in locals():
@@ -204,8 +256,8 @@ def plotAbundanceAllClasses(trap, countsTh, percentageTh, resultFileName, useSna
         #                  "Diptera Trichocera", "Ephemeroptera", "Hemiptera", "Hymenoptera Other", "Hymenoptera Vespidae", 
         #                  "Lepidoptera Macros", "Lepidoptera Micros", "Neuroptera", "Opiliones", "Trichoptera"]
         selDataset = selDataset2.loc[selDataset2['class'] == labelName]
-        print(trap, labelName, len(selDataset))
         abundance = countAbundance(selDataset, dateList)
+        print(trap, labelName, len(selDataset), sum(abundance))
 
         labelText = labelName #+ ' ' + str(countsTh*2) + 's'
         colorIdx = labelNamesPlot.index(labelName)
@@ -225,7 +277,7 @@ def plotAbundanceAllClasses(trap, countsTh, percentageTh, resultFileName, useSna
             ax.set_yscale('log')
         if idxFig in [13, 14, 15]: 
             ax.set_xlabel('Day of Year')
-        ax.set_xlim(180, 320)
+        ax.set_xlim(dayOfYear[0], dayOfYear[-1]) # NB adjust for days operational
         if idxFig in [1, 4, 7, 10, 13]: 
             if useSnapImages:
                 ax.set_ylabel('Observations')
@@ -235,8 +287,8 @@ def plotAbundanceAllClasses(trap, countsTh, percentageTh, resultFileName, useSna
         idxFig += 1
   
     plt.suptitle(subtitle)
-    plt.tight_layout(pad=1.0)
-    plt.savefig("./results/" + resultFileName)
+    plt.tight_layout(pad=2.0)
+    plt.savefig("./results/" + resultFileName + ".png")
     plt.show() 
 
 if __name__ == '__main__':
@@ -255,11 +307,11 @@ if __name__ == '__main__':
     #plotAbundanceSelectedClasses(countsTh, percentageTh)
     
     traps = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4'] #, 'SS1', 'SS2', 'SS3', 'SS4']
-    #traps = ['LV1', 'OH1'] #, 'SS1', 'SS2', 'SS3', 'SS4']
+    #traps = ['OH4'] #, 'SS1', 'SS2', 'SS3', 'SS4']
     #analyseSnapFiles(traps)
     
     for trap in traps:
-        plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundance_moths/" + trap +"_Abundance.png")
+        plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundance_moths/" + trap +"_Abundance")
     #for trap in traps:
     #    plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundanceSnap/" + trap +"_Abundance.png", useSnapImages=True)
     
