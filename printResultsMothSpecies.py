@@ -190,11 +190,17 @@ def plotMothSpecies(trap, mothSpecies, resultFileName, numSpecies):
     
     species = []
     abundance = []
+    numSpeciesFive = 0
+    numSpeciesAll = 0
     for i, key in enumerate(mothSpecies):
-        species.append(key)
-        abundance.append(mothSpecies[key])
-        if i >= numSpecies-1: 
-            break;
+        if i < numSpecies:
+            species.append(key)
+            abundance.append(mothSpecies[key])
+        if mothSpecies[key] > 4:
+            numSpeciesFive += 1
+        numSpeciesAll += 1
+            
+    print(trap, numSpeciesFive, numSpeciesAll)    
 
     #bar_labels = ['red', 'blue', '_red', 'orange']
     #bar_colors = ['tab:red', 'tab:blue', 'tab:red', 'tab:orange']
@@ -215,7 +221,7 @@ def plotAbundanceAllClasses(trap, countsTh, percentageTh, resultFileName, useSna
     
     dateList, dayOfYear, selDataset2 = loadTrackFiles(trap, countsTh, percentageTh)
     mothSpecies, mothSpeciesNames = findMothSpecies(selDataset2, 15)
-    plotMothSpecies(trap, mothSpecies, resultFileName, numSpecies=30)
+    plotMothSpecies(trap, mothSpecies, resultFileName, numSpecies=50)
   
     td = timedate()
     subtitle = trap + " (" + td.strMonthDay(dateList[0]) + '-' + td.strMonthDay((dateList[-1])) + ")"
@@ -307,7 +313,7 @@ if __name__ == '__main__':
     #plotAbundanceSelectedClasses(countsTh, percentageTh)
     
     traps = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4'] #, 'SS1', 'SS2', 'SS3', 'SS4']
-    #traps = ['OH4'] #, 'SS1', 'SS2', 'SS3', 'SS4']
+    #traps = ['LV2'] #, 'SS1', 'SS2', 'SS3', 'SS4']
     #analyseSnapFiles(traps)
     
     for trap in traps:
