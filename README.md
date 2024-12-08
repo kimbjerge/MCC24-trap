@@ -3,7 +3,7 @@ This project contains Python code for processing time-lapse and motion images fr
 The repository contains Python code for steps 1-4 in figure below. (The three datasets are not included only the trained models and weights)
 
 The work and results are described in the paper: "Towards edge processing of images from insect camera traps"
-https://www.biorxiv.org/content/10.1101/2024.07.01.601488v1
+https://www.biorxiv.org/content/10.1101/2024.07.01.601488v2
 
 
 ![Alt text](EdgeProcessingNocturalInsects.png)
@@ -21,7 +21,7 @@ raspberryInstall.sh - bash script to install Python environment on RaspberryPi 4
 
 https://drive.google.com/file/d/17ABGAg3b7hmxW4DbfI7wwZp4iU_PpbAB/view?usp=drive_link
 
-See below video with annotated tracks of classified insects (Order/suborder/moth species) based on the test images:
+See below video with annotated tracks of classified insects (broad taxonomic groups and moth species) based on the test images:
 
 [![Watch the video](InsectImage2.jpg)](https://www.youtube.com/watch?v=HzOCYlgnhlE&t=488s)
 
@@ -70,13 +70,13 @@ common - species classifier code
 
 ml - species classifier code
 
-orderClassifier.py - order classifier code 
+orderClassifier.py - broad taxon classifier code 
 
-orderAndSpeciesClassifier.py - combined order and species classifier
+orderAndSpeciesClassifier.py - combined broad taxon and species classifier
 
 resnet50.py - model used for order classifier 
 
-model_order_100524 - contains the newest ResNet50 model weights for order classifier and thresholds with order labels
+model_order_100524 - contains the newest ResNet50 model weights for broad taxon classifier and thresholds with 15 groups of taxon labels
 
 
 ## Training and testing insect detector model ##
@@ -100,10 +100,10 @@ testInsectsMoths.sh
 
 ## Detecting, classifying and tracing insects ##
 
-### Combined YOLOv5 detection, ResNet50 order and species classifier ###
-detectClassifyInsects.py - Detector and order classifier
+### Combined YOLOv5 detection, ResNet50 broad taxon and species classifier ###
+detectClassifyInsects.py - Detector and broad taxon classifier
 
-detectClassifySpecies.py - Detector, order and species classifier
+detectClassifySpecies.py - Detector, broad taxon and species classifier
 
 insectMoths-bestF1-1280m6.pt - YOLOv5m6 medium model trained to detect insects
 
@@ -135,11 +135,11 @@ Content of *TRS.csv files which contain lines for each detection related to trac
 ## Plotting, making movies and printing results ##
 createMoveiCSV.py - Create movies based on the detection and classification CSV files without tracking
 
-plotResults.py - Plotting results for tracking and order classifications
+plotResults.py - Plotting results for tracking and broad taxon classifications
 
 plotSampleTimeResults.py - Plotting results for comparing tracking and different time-lapse sampling intervals
 
-plotStatistics.py - Calculating and printing statistics for tracking and order classifications
+plotStatistics.py - Calculating and printing statistics for tracking and broad taxon classifications
 
 
 
