@@ -105,7 +105,20 @@ def createDatelist(dataset):
             dayOfYears.append(int(dayOfYear))
 
     return dates, dayOfYears
-   
+  
+
+# Correction of label names in paper
+def correctLabelName(name):
+    
+    if "Lepidoptera Macros" in name:
+        name = name.replace("Macros", "Macro")
+    if "Lepidoptera Micros" in name:
+        name = name.replace("Micros", "Micro")
+    if "Diptera Trichocera" in name:
+        name = name.replace("Trichocera", "Trichoceridae")
+        
+    return name
+        
 def countAbundance(dataset, dates):
 
     abundance = np.zeros(len(dates)).tolist()
@@ -213,7 +226,7 @@ def plotTimeHistograms(traps, trackPath, countsTh, percentageTh, labelNames, res
             plt.plot(listAvgD, listPb, 'k')
             plt.text(200, 400, "Avg " + str(averageDuration), fontsize = 14)
 
-            labels += ' ' + labelName
+            labels += ' ' + correctLabelName(labelName)
             colorIdx += 1  
             
             #https://ipython-books.github.io/75-fitting-a-probability-distribution-to-data-with-the-maximum-likelihood-method/
@@ -291,7 +304,7 @@ def plotTimeHistogramsAllClasses(traps, trackPath, countsTh, percentageTh, label
             labels += ' ' + labelName
             
             #title += " (" + td.strMonthDay(dateList[0]) + '-' + td.strMonthDay((dateList[-1])) + ")"
-            title = labelName
+            title = correctLabelName(labelName)
             ax.set_title(title)
             ax.set_xlim(0, 1200)
             #if idxFig in [1, 15]:
@@ -439,7 +452,7 @@ def plotAbundanceAllClasses(trap, countsTh, percentageTh, resultFileName, useSna
         else:
             ax = figure.add_subplot(5, 3, idxFig) 
              
-        title = labelName
+        title = correctLabelName(labelName)
         colorIdx = 0
         if useSnapImages:
             colors = ["green", "cyan",  "orange", 
@@ -668,9 +681,9 @@ def analyseAbundanceSampleTime(trap, labelNames, countsTh, percentageTh, resultF
             #print(trap, labelName, len(dayOfYear),  sum(abundanceTrack), sum(abundanceTL), sampleTime, correlation, cosine)
             #sampleTimesCorrelation.append([sampleTime, len(dayOfYear), sum(abundanceTrack), sum(abundanceTL), correlation, cosine])
     
-            labelText = labelName + ' (track)'
+            labelText = correctLabelName(labelName) + ' (track)'
             ax.plot(dayOfYear, abundanceTrack, label=labelText, color="red")
-            labelText = labelName + ' (TL)'
+            labelText = correctLabelName(labelName) + ' (TL)'
             ax.plot(dayOfYear, abundanceTL, label=labelText, color="black")
             
             #title += "  " + td.strMonthDay(dateList[0]) + '-' + td.strMonthDay((dateList[-1])) + r"  $\rho$=" + str(correlation)
@@ -687,7 +700,7 @@ def analyseAbundanceSampleTime(trap, labelNames, countsTh, percentageTh, resultF
             
             idxFig += 1
         
-        subtitle = trap + " " + labelName
+        subtitle = trap + " " + correctLabelName(labelName)
         plt.suptitle(subtitle)
         #plt.tight_layout(pad=1.0)
         plt.savefig(resultFileName + "_" + labelName + ".png")
@@ -786,7 +799,7 @@ if __name__ == '__main__':
     traps = ['OH1', 'OH2', 'OH3', 'OH4']
     #plotTimeHistogramsSelectedTrap(traps, countsTh, percentageTh, "OH")
     #traps = ['LV1', 'LV2', 'LV3', 'LV4']
-    traps = ['LV2', 'SS1']
+    traps = ['LV2']
     #plotTimeHistogramsSelectedTrapAllClasses(traps, countsTh, percentageTh)
     
     

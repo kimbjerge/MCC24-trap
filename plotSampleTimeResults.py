@@ -20,6 +20,17 @@ labelNamesPlot3 = ["Lepidoptera Macros", "Lepidoptera Micros", "Neuroptera", "Op
 labelNamesLepidoptera = ["Lepidoptera Macros", "Lepidoptera Micros"]
 
 #sampleTimesCorrelation.append([sampleTime, len(dayOfYear), sum(abundanceTrack), sum(abundanceTL), correlation, cosine])
+# Correction of label names in paper
+def correctLabelName(name):
+    
+    if "Lepidoptera Macros" in name:
+        name = name.replace("Macros", "Macro")
+    if "Lepidoptera Micros" in name:
+        name = name.replace("Micros", "Micro")
+    if "Diptera Trichocera" in name:
+        name = name.replace("Trichocera", "Trichoceridae")
+        
+    return name
 
 id_sampleTime = 0
 id_numDays = 1
@@ -48,7 +59,7 @@ def plotSampleTimeCorrelation(trap, trapCorrelations, labelNames):
             cosines.append(record[id_cosine])
             avgInsects = int(round(record[id_abundanceTrack]/record[id_numDays]))
         
-        labelText = labelName + " (" + str(avgInsects) + ")"
+        labelText = correctLabelName(labelName) + " (" + str(avgInsects) + ")"
         ax.plot(sampleTimes, correlations, label=labelText, color=colors[colorIdx], marker="+")
         colorIdx += 1
     
@@ -169,7 +180,7 @@ def plotSampleTimeCorrelationTraps(trapsCorr, labelNames, resultFileName, usePea
                 if avgInsectsTraps < 10:
                     titleColor = "red"
                                     
-                ax.set_title(labelName + " (" + str(avgInsectsTraps) + ")", color=titleColor)
+                ax.set_title(correctLabelName(labelName) + " (" + str(avgInsectsTraps) + ")", color=titleColor)
                 #if idxFig == 1:
                 #ax.legend(loc='lower right')
                 #ax.set_xscale('log')
@@ -200,7 +211,7 @@ def plotSampleTimeCorrelationTraps(trapsCorr, labelNames, resultFileName, usePea
             if avgInsectsTraps < 10:
                 titleColor = "red"
                                 
-            ax.set_title(labelName + " (" + str(avgInsectsTraps) + ")", color=titleColor)
+            ax.set_title(correctLabelName(labelName) + " (" + str(avgInsectsTraps) + ")", color=titleColor)
             ax.set_ylim(0,1)
             if idxFig in [13, 14, 15]: 
                 ax.set_xlabel('Average detections per. night')
