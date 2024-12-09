@@ -6,7 +6,7 @@ The work and results are described in the paper: "Towards edge processing of ima
 https://www.biorxiv.org/content/10.1101/2024.07.01.601488v2
 
 
-![Alt text](EdgeProcessingNocturalInsects.png)
+![Alt text](EdgeProcessingNocturalInsectsTaxon.png)
 
 ## Python environment files ##
 envreq.txt - environment requirements
