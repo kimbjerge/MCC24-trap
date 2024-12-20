@@ -139,7 +139,7 @@ plotResults.py - Plotting results for tracking and broad taxon classifications
 
 plotSampleTimeResults.py - Plotting results for comparing tracking and different time-lapse sampling intervals
 
-plotStatistics.py - Calculating and printing statistics for tracking and broad taxon classifications
+printStatistics.py - Calculating and printing statistics for tracking and broad taxon classifications
 
 
 
