@@ -100,7 +100,7 @@ testInsectsMoths.sh
 
 ## Detecting, classifying and tracing insects ##
 
-### Combined YOLOv5 detection, ResNet50 broad taxon and species classifier ###
+### Combined YOLOv5 detection, ResNet50 broad taxon and species classifier (Steps 1.-3.) ###
 detectClassifyInsects.py - Detector and broad taxon classifier
 
 detectClassifySpecies.py - Detector, broad taxon and species classifier
@@ -115,7 +115,7 @@ Content of *.csv files which contain lines for each detection (YYYYMMDD.csv):
 
 	year,trap,date,time,detectConf,detectId,x1,y1,x2,y2,fileName,orderLabel,orderId,orderConf,aboveTH,key,speciesLabel,speciesId,speciesConf
 
-### Insect tacking ###
+### Insect tacking  (Step 4.) ###
 trackInsects.py - performs tracing of insects based on CSV files generated from combined YOLOv5 detector and ResNet50 classifier 
                   (Set useSpeciesPredictions=True for using the moth species classifier predictions, else tracking for broad taxon only)
 
