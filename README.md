@@ -116,7 +116,8 @@ Content of *.csv files which contain lines for each detection (YYYYMMDD.csv):
 	year,trap,date,time,detectConf,detectId,x1,y1,x2,y2,fileName,orderLabel,orderId,orderConf,aboveTH,key,speciesLabel,speciesId,speciesConf
 
 ### Insect tacking ###
-trackInsects.py - performs tracing of insects based on CSV files generated from combined YOLOv5 detector and ResNet50 classifier
+trackInsects.py - performs tracing of insects based on CSV files generated from combined YOLOv5 detector and ResNet50 classifier 
+                  (Set useSpeciesPredictions=True for using the moth species classifier predictions, else tracking for broad taxon only)
 
 ITC_config.json - configuration file for insect tracking
 
@@ -135,7 +136,9 @@ Content of *TRS.csv files which contain lines for each detection related to trac
 ## Plotting, making movies and printing results ##
 createMoveiCSV.py - Create movies based on the detection and classification CSV files without tracking
 
-plotResults.py - Plotting results for tracking and broad taxon classifications
+plotResultsBroadTaxon.py - Plotting results for tracking with broad taxon classifier (tracking without moth species classifier)
+
+plotResultsMothSpecies.py - Plotting results for tracing with broad taxon and moth species classifier
 
 plotSampleTimeResults.py - Plotting results for comparing tracking and different time-lapse sampling intervals
 
