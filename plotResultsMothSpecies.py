@@ -28,10 +28,10 @@ config_filename = './ITC_config.json'
 #trackPath = "./tracks/tracks_order/"
 #csvPath = "./CSV/M2022/"
 #trackPath = "./tracks/tracks_060524_spieces/"
-trackPath = "./tracks_moths/"
-csvPath = "./CSV/M2022S/"
-#trackPath = "./tracks_2023/"
-#csvPath = "./CSV/M2023S/"
+#trackPath = "./tracks_2022_moths/"
+#csvPath = "./CSV/M2022S/"
+trackPath = "./tracks_2023_moths/"
+csvPath = "./CSV/M2023S/"
 
 class timedate:
     
@@ -312,12 +312,12 @@ if __name__ == '__main__':
     # %% Abundance plots
     #plotAbundanceSelectedClasses(countsTh, percentageTh)
     
-    traps = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4'] #, 'SS1', 'SS2', 'SS3', 'SS4']
-    #traps = ['LV2'] #, 'SS1', 'SS2', 'SS3', 'SS4']
+    traps = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3', 'SS4']
+    #traps = ['SS3', 'SS4']
     #analyseSnapFiles(traps)
     
     for trap in traps:
-        plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundance_moths/" + trap +"_Abundance")
+        plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundance_moths_2023/" + trap +"_Abundance")
     #for trap in traps:
     #    plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundanceSnap/" + trap +"_Abundance.png", useSnapImages=True)
     

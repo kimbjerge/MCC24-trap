@@ -31,10 +31,10 @@ labelNames = ["Lepidoptera Macros", "Lepidoptera Micros"]
 config_filename = './ITC_config.json'
 #trackPath = "./tracks/tracks_order/"
 #csvPath = "./CSV/M2022/"
-#trackPath = "./tracks/"
-#csvPath = "./CSV/M2022S/"
-trackPath = "./tracks_2023/"
-csvPath = "./CSV/M2023S/"
+trackPath = "./tracks/"
+csvPath = "./CSV/M2022S/"
+#trackPath = "./tracks_2023/"
+#csvPath = "./CSV/M2023S/"
 
 class timedate:
     
@@ -787,8 +787,8 @@ if __name__ == '__main__':
     #analyseSnapFiles(traps)
     
     for trap in traps:
-        #plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundance_2022/" + trap +"_Abundance.png")
-        plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundance_2023/" + trap +"_Abundance.png")
+        plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundance_2022/" + trap +"_Abundance.png")
+        #plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundance_2023/" + trap +"_Abundance.png")
     #for trap in traps:
     #    plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundanceSnap/" + trap +"_Abundance.png", useSnapImages=True)
     
