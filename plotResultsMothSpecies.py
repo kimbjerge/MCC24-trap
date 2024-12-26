@@ -24,14 +24,23 @@ labelNamesPlot = ["Araneae", "Coleoptera", "Diptera Brachycera", "Diptera Nemato
                   "Diptera Trichocera", "Ephemeroptera", "Hemiptera", "Hymenoptera Other", "Hymenoptera Vespidae", 
                   "Lepidoptera Macros", "Lepidoptera Micros", "Neuroptera", "Opiliones", "Trichoptera"]
 
+#labelMothsPlot = ["Amphipyra pyramidea", "Autographa gamma", "Noctua fimbriata", "Xestia", "Agrotis puta", 
+#                  "Sphinx ligustri", "Catocala", "Lemonia dumi", "Arctia caja", "Saturnia pavonia", 
+#                  "Acherontia atropos", "Staurophora celsia", "Lomaspilis marginata", "Hyles", "Biston"]
+
+labelMothsPlot = ["Agrotis puta", "Amphipyra pyramidea", "Arctia caja", "Autographa gamma", "Biston",
+                  "Catocala", "Deltote pygarga", "Hyles", "Hypomecis", "Lomaspilis marginata", 
+                  "Noctua fimbriata", "Phalera bucephala", "Spilosoma lubricipeda", "Staurophora celsia", "Xestia"]
+
 config_filename = './ITC_config.json'
+
+yearSelected = "2024" # Select year 2022, 2023, 2024
+trackPath = "./tracks_" + yearSelected + "_moths/"
+csvPath = "./CSV/M" + yearSelected + "S/"
+
 #trackPath = "./tracks/tracks_order/"
 #csvPath = "./CSV/M2022/"
 #trackPath = "./tracks/tracks_060524_spieces/"
-#trackPath = "./tracks_2022_moths/"
-#csvPath = "./CSV/M2022S/"
-trackPath = "./tracks_2023_moths/"
-csvPath = "./CSV/M2023S/"
 
 class timedate:
     
@@ -126,7 +135,7 @@ def countSnapAbundance(predicted, dates, labelName, valid=True):
 
     return abundance    
 
-def loadTrackFiles(trap, countsTh, percentageTh):
+def loadTrackFiles(trap, countsTh, percentageTh, trackPath=trackPath):
 
     trackFiles = trackPath + trap + '/'  
     dataframes = []
@@ -181,7 +190,7 @@ def findMothSpecies(dataframe, numSpecies):
    
     return mothSpeciesSorted, mothSpeciesNames
 
-def plotMothSpecies(trap, mothSpecies, resultFileName, numSpecies):
+def plotMothSpecies(trap, mothSpecies, resultFileName, numSpecies, selectedYear=""):
     
     figure = plt.figure(figsize=(20,20))
     figure.tight_layout(pad=1.0)
@@ -208,10 +217,10 @@ def plotMothSpecies(trap, mothSpecies, resultFileName, numSpecies):
     ax.barh(species, abundance)
     
     ax.set_xlabel('Tracks')
-    ax.set_title('Abundance of moth species ' + trap)
+    ax.set_title('Abundance of moth species ' + trap + ' ' + selectedYear)
     #ax.legend(title='Fruit color')
     plt.tight_layout(pad=2.0)
-    plt.savefig("./results/" + resultFileName + "Barh.png")
+    plt.savefig("./results/" + resultFileName + "LT" + selectedYear + ".png")
     
     plt.show()
         
@@ -297,6 +306,102 @@ def plotAbundanceAllClasses(trap, countsTh, percentageTh, resultFileName, useSna
     plt.savefig("./results/" + resultFileName + ".png")
     plt.show() 
 
+def plotAbundanceAllYears(trap, selectedYears, countsTh, percentageTh, resultFileName, useSnapImages=False):
+  
+    firstYear = True
+    trackFiles = trackPath + trap + '/'
+    
+    for selectedYear in selectedYears:
+        
+        yearTrackPath = "./tracks_" + selectedYear + "_moths/"
+        
+        dateList, dayOfYear, selDataset2 = loadTrackFiles(trap, countsTh, percentageTh, trackPath=yearTrackPath)
+        mothSpecies, mothSpeciesNames = findMothSpecies(selDataset2, 15)
+        #plotMothSpecies(trap, mothSpecies, resultFileName, numSpecies=50, selectedYear=selectedYear)
+      
+        td = timedate()
+        subtitle = trap + " " + selectedYear + " (" + td.strMonthDay(dateList[0]) + '-' + td.strMonthDay((dateList[-1])) + ")"
+        
+        print(subtitle)
+     
+        if useSnapImages:    
+            predicted = loadSnapFiles(trap)
+        
+
+        figure = plt.figure(figsize=(20,20))
+        figure.tight_layout(pad=1.0)
+        plt.rcParams.update({'font.size': 20})
+                              
+        idxFig = 1
+        if firstYear == True:
+            firstYear = False
+            #labelNamesPlot = mothSpeciesNames 
+            labelNamesPlot = labelMothsPlot
+            
+        for labelName in labelNamesPlot:
+    
+            if "ax" in locals():
+                ax = figure.add_subplot(5, 3, idxFig, sharex = ax) #, sharey = ax) 
+            else:
+                ax = figure.add_subplot(5, 3, idxFig) 
+                 
+            title = labelName
+            colorIdx = 0
+            if useSnapImages:
+                colors = ["green", "cyan",  "orange", 
+                          "orange","green", "cyan", 
+                          "green", "cyan",  "orange", 
+                          "orange","green", "cyan",  
+                          "green", "cyan",  "orange"]
+            else:
+                colors = ["green", "red", "purple", 
+                          "brown", "brown", "purple", 
+                          "olive",  "cyan", "orange", 
+                          "red",   "green", "blue", 
+                          "cyan", "orange", "olive"]
+                
+                      
+            #labelNamesPlot = ["Araneae", "Coleoptera", "Diptera Brachycera", "Diptera Nematocera", "Diptera Tipulidae", 
+            #                  "Diptera Trichocera", "Ephemeroptera", "Hemiptera", "Hymenoptera Other", "Hymenoptera Vespidae", 
+            #                  "Lepidoptera Macros", "Lepidoptera Micros", "Neuroptera", "Opiliones", "Trichoptera"]
+            selDataset = selDataset2.loc[selDataset2['class'].str.contains(labelName)]
+            abundance = countAbundance(selDataset, dateList)
+            print(trap, labelName, len(selDataset), sum(abundance))
+    
+            labelText = labelName #+ ' ' + str(countsTh*2) + 's'
+            colorIdx = labelNamesPlot.index(labelName)
+            ax.plot(dayOfYear, abundance, label="Tracks", color=colors[colorIdx])
+            
+            if useSnapImages:    
+                abundanceSnap = countSnapAbundance(predicted, dateList, labelName)
+                ax.plot(dayOfYear, abundanceSnap, label="TL", color="black")
+                correlation, _ = pearsonr(abundance, abundanceSnap)
+                correlation = np.round(correlation * 100)/100
+                title += r" ($\rho$=" + str(correlation) + ")"
+      
+            ax.set_title(title)
+            if useSnapImages and idxFig == 1:
+                ax.legend()  
+            if useSnapImages:
+                ax.set_yscale('log')
+            if idxFig in [13, 14, 15]: 
+                ax.set_xlabel('Day of Year')
+            ax.set_xlim(dayOfYear[0], dayOfYear[-1]) # NB adjust for days operational
+            if idxFig in [1, 4, 7, 10, 13]: 
+                if useSnapImages:
+                    ax.set_ylabel('Observations')
+                else:
+                    ax.set_ylabel('Tracks')
+            ax.set_xlim(120, 280)
+            
+            idxFig += 1
+      
+        plt.suptitle(subtitle)
+        plt.tight_layout(pad=2.0)
+        plt.savefig("./results/" + resultFileName + selectedYear + ".png")
+        plt.show() 
+
+
 if __name__ == '__main__':
 
     countsTh = 2 # 4 sec or three detections in one track
@@ -305,8 +410,7 @@ if __name__ == '__main__':
     # %% tíme-lapse sample times vs. motion tracks
     
     #analyseSampleTime(countsTh, percentageTh)
-    
-    
+      
     plt.rcParams.update({'font.size': 14})
     
     # %% Abundance plots
@@ -316,8 +420,11 @@ if __name__ == '__main__':
     #traps = ['SS3', 'SS4']
     #analyseSnapFiles(traps)
     
+    #traps = ['LV1']
     for trap in traps:
-        plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundance_moths_2023/" + trap +"_Abundance")
+        plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundance_moths_" + yearSelected + "/" + trap +"_Abundance") # Change year here!!!
+
+    #plotYears = ["2022", "2023", "2024"]
     #for trap in traps:
-    #    plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundanceSnap/" + trap +"_Abundance.png", useSnapImages=True)
+    #    plotAbundanceAllYears(trap, plotYears, countsTh, percentageTh, "./abundance_moths_all_years/" + trap + "_")
     
