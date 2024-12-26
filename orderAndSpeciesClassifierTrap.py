@@ -108,23 +108,29 @@ class orderSpeciesClassifier:
     
     def classifySpeciesTrapBatch(self):            
         self.imagesInBatch = self.imagesInBatch.to(self.device)
-        predictions = self.speciesModel(self.imagesInBatch)
+        output = self.speciesModel(self.imagesInBatch)
+        predictions = torch.nn.functional.softmax(output, dim=1)
+        
         predictions = predictions.cpu().detach().numpy()
         predicted_labels = np.argmax(predictions, axis=1)
         
         lines = []
         for idx in range(len(predictions)):
             predicted_label = predicted_labels[idx]
-            if self.speciesSamples[predicted_label] > 1: # More than one sample to estimate confidence value in percentage
-                confidence_value = norm.cdf(predictions[idx][predicted_label], self.speciesMeans[predicted_label], self.speciesStds[predicted_label])
-                confidence_value = round(confidence_value*10000)/100
-            else:
-                confidence_value = 100.0
+            confidence_value = np.round(predictions[idx][predicted_label]*10000)/100
+            
+            # Below code not very accurated since insufficient samples in dataset
+            #if self.speciesSamples[predicted_label] > 1: # More than one sample to estimate confidence value in percentage
+            #    confidence_value = norm.cdf(predictions[idx][predicted_label], self.speciesMeans[predicted_label], self.speciesStds[predicted_label])
+            #    confidence_value = round(confidence_value*10000)/100
+            #else:
+            #    confidence_value = 100.0
             #if predictions[idx][predicted_label] >= self.speciesThresholds[predicted_label]:
             #    sure_label = True
             #else:
             #    sure_label = False
             #line = f"{self.labels[predicted_label]},{predicted_label},{confidence_value},{sure_label}"
+            
             line = f"{self.speciesLabels[predicted_label]},{predicted_label},{confidence_value}"
             #print(line)
             lines.append(line)
