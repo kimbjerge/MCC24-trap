@@ -1,16 +1,26 @@
 import numpy as np
 import math
 import json
+import pandas as pd
 from datetime import datetime
 from datetime import timedelta
 
 class Stats:
     def __init__(self, config):
         self.species = config["classifier"]["species"]
-        with open(config["classifier"]["speciesJSON"]) as f:
-            speciesLabels = json.load(f)
-        for label in speciesLabels.keys():
-            self.species.append(label)
+        
+        if config["classifier"]["speciesClassifer"] == "JSON": # Use UK/Denmark AMI species classifier
+            with open(config["classifier"]["speciesJSON"]) as f:
+                speciesLabels = json.load(f)
+            for label in speciesLabels.keys():
+                self.species.append(label)
+        
+        if config["classifier"]["speciesClassifer"] == "CSV": # Use Denmark AMT species classifier
+            speciesLabels = pd.read_csv(config["classifier"]["speciesCSV"])
+            for i in speciesLabels.index:
+                self.species.append(speciesLabels.loc[i]["ClassName"])
+        #print(self.species)
+
         self.species.append('unknown')
         self.mincounts = config["stats"]["mincounts"]
         self.count = {}
