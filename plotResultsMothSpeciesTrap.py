@@ -5,6 +5,7 @@ Created on Sat Nov 16 14:15:07 2024
 @author: Kim Bjerge
 """
 import os
+import json
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -14,6 +15,7 @@ import datetime
 from scipy.stats import expon
 from idac.configreader.configreader import readconfig
 from idac.predictions.predictions import Predictions
+from idac.configreader.configreader import readconfig
 from scipy.stats import pearsonr
 
 orderSuborderNames = ["Araneae", "Coleoptera", "Diptera Brachycera", "Diptera Nematocera", "Diptera Tipulidae", 
@@ -34,9 +36,9 @@ labelMothsPlot = ["Agrotis puta", "Amphipyra pyramidea", "Arctia caja", "Autogra
 
 config_filename = './ITC_config.json'
 
-yearSelected = "2024" # Select year 2022, 2023, 2024
-trackPath = "./tracks_" + yearSelected + "_moths/"
-csvPath = "./CSV/M" + yearSelected + "S/"
+yearSelected = "2022" # Select year 2022, 2023, 2024
+trackPath = "./tracks_" + yearSelected + "_moths_trap/"
+csvPath = "./CSV/M" + yearSelected + "ST/"
 
 #trackPath = "./tracks/tracks_order/"
 #csvPath = "./CSV/M2022/"
@@ -91,7 +93,24 @@ class timedate:
         seconds = self.getSeconds(recTime)
         text = str(minutes).zfill(2) + ":" + str(seconds).zfill(2)
         return text
+
+def loadMothSpeciesClassifiers():
     
+    config = readconfig(config_filename)
+    
+    speciesGBIF = []
+    with open(config["classifier"]["speciesJSON"]) as f:
+        speciesGBIFLabels = json.load(f)
+    for label in speciesGBIFLabels.keys():
+        speciesGBIF.append(label)
+
+    speciesTRAP = []
+    speciesTRAPLabels = pd.read_csv(config["classifier"]["speciesCSV"])
+    for i in speciesTRAPLabels.index:
+        speciesTRAP.append(speciesTRAPLabels.loc[i]["ClassName"])
+        
+    return speciesGBIF, speciesTRAP
+                
 def createDatelist(dataset):
 
     td = timedate()
@@ -143,7 +162,7 @@ def loadTrackFiles(trap, countsTh, percentageTh, trackPath=trackPath):
         if "TR.csv" in fileName:
             #print(trap, trackFiles + fileName)
             #data_df = pd.read_json(trackFiles + fileName)
-            print(fileName)
+            #print(fileName)
             data_df = pd.read_csv(trackFiles + fileName)
             dataframes.append(data_df)                
     dataset = pd.concat(dataframes)
@@ -189,6 +208,57 @@ def findMothSpecies(dataframe, numSpecies):
             break;
    
     return mothSpeciesSorted, mothSpeciesNames
+
+def findMothSpecies2(dataframe1, dataframe2, numSpecies):
+    
+    mothSpecies1 = {} # TRAP classifier
+    for index, row in dataframe1.iterrows():
+        className = row['class']
+        if className not in orderSuborderNames:
+            #print(className)
+            if className in mothSpecies1.keys():
+                mothSpecies1[className] += 1
+            else:
+                mothSpecies1[className] = 1
+                
+    mothSpecies1Sorted = dict(sorted(mothSpecies1.items(), key=lambda item: item[1], reverse=True))
+
+    mothSpecies2 = {} # GBIF classifier
+    for index, row in dataframe2.iterrows():
+        className = row['class']
+        if className not in orderSuborderNames:
+            #print(className)
+            if className in mothSpecies2.keys():
+                mothSpecies2[className] += 1
+            else:
+                mothSpecies2[className] = 1 
+
+    mothSpecies2Sorted = dict(sorted(mothSpecies2.items(), key=lambda item: item[1], reverse=True))
+    
+    speciesGBIF, speciesTRAP = loadMothSpeciesClassifiers()
+    
+    mothSpeciesDiff = {}
+    for i, key in enumerate(mothSpecies1Sorted):
+        if key in mothSpecies2Sorted.keys():
+            numbers = mothSpecies2Sorted[key] + mothSpecies1Sorted[key] - np.abs(mothSpecies2Sorted[key] - mothSpecies1Sorted[key])
+        else:
+            if key in speciesGBIF:
+                print("Moth species not found by GBIF classifier ", key)
+            else:
+                print("***Moth species not in GBIF classifier ", key)
+                
+            numbers = 0
+        mothSpeciesDiff[key] = numbers
+        
+    mothSpeciesDiffSorted = dict(sorted(mothSpeciesDiff.items(), key=lambda item: item[1], reverse=True))  
+     
+    mothSpeciesNames = []
+    for i, key in enumerate(mothSpeciesDiffSorted):
+        mothSpeciesNames.append(key)
+        if i >= numSpecies-1: 
+            break;
+            
+    return mothSpeciesDiffSorted, mothSpeciesNames
 
 def plotMothSpecies(trap, mothSpecies, resultFileName, numSpecies, selectedYear=""):
     
@@ -306,21 +376,28 @@ def plotAbundanceAllClasses(trap, countsTh, percentageTh, resultFileName, useSna
     plt.savefig("./results/" + resultFileName + ".png")
     plt.show() 
 
-def plotAbundanceAllYears(trap, selectedYears, countsTh, percentageTh, resultFileName, useSnapImages=False):
+def plotAbundanceAllYears(trap, selectedYears, countsTh, percentageTh, resultFileName, plotGBIFClassifier=True, useSnapImages=False):
   
     firstYear = True
     trackFiles = trackPath + trap + '/'
     
     for selectedYear in selectedYears:
         
-        yearTrackPath = "./tracks_" + selectedYear + "_moths/"
+        yearTrackPathGBIF = "C:/IHAK/MCC24-trap/tracks_" + selectedYear + "_moths/"
+        yearTrackPathTRAP = "./tracks_" + selectedYear + "_moths_trap/"
         
-        dateList, dayOfYear, selDataset2 = loadTrackFiles(trap, countsTh, percentageTh, trackPath=yearTrackPath)
-        mothSpecies, mothSpeciesNames = findMothSpecies(selDataset2, 15)
+        dateList1, dayOfYear1, selDatasetGBIF = loadTrackFiles(trap, countsTh, percentageTh, trackPath=yearTrackPathGBIF)
+        dateList2, dayOfYear2, selDatasetTRAP = loadTrackFiles(trap, countsTh, percentageTh, trackPath=yearTrackPathTRAP)
+        
+        # Select method to select species based on TRAP, GBIF or both classifiers
+        #mothSpecies, mothSpeciesNames = findMothSpecies(selDatasetTRAP, 15)
+        #mothSpecies, mothSpeciesNames = findMothSpecies(selDatasetGBIF, 15)
+        mothSpecies, mothSpeciesNames = findMothSpecies2(selDatasetGBIF, selDatasetTRAP, 15)
+        
         #plotMothSpecies(trap, mothSpecies, resultFileName, numSpecies=50, selectedYear=selectedYear)
       
         td = timedate()
-        subtitle = trap + " " + selectedYear + " (" + td.strMonthDay(dateList[0]) + '-' + td.strMonthDay((dateList[-1])) + ")"
+        subtitle = trap + " " + selectedYear + " (" + td.strMonthDay(dateList1[0]) + '-' + td.strMonthDay((dateList1[-1])) + ")"
         
         print(subtitle)
      
@@ -336,7 +413,7 @@ def plotAbundanceAllYears(trap, selectedYears, countsTh, percentageTh, resultFil
         if firstYear == True:
             firstYear = False
             #labelNamesPlot = mothSpeciesNames 
-            labelNamesPlot = labelMothsPlot
+            labelNamesPlot = labelMothsPlot # Use fixed selected species
             
         for labelName in labelNamesPlot:
     
@@ -364,29 +441,35 @@ def plotAbundanceAllYears(trap, selectedYears, countsTh, percentageTh, resultFil
             #labelNamesPlot = ["Araneae", "Coleoptera", "Diptera Brachycera", "Diptera Nematocera", "Diptera Tipulidae", 
             #                  "Diptera Trichocera", "Ephemeroptera", "Hemiptera", "Hymenoptera Other", "Hymenoptera Vespidae", 
             #                  "Lepidoptera Macros", "Lepidoptera Micros", "Neuroptera", "Opiliones", "Trichoptera"]
-            selDataset = selDataset2.loc[selDataset2['class'].str.contains(labelName)]
-            abundance = countAbundance(selDataset, dateList)
-            print(trap, labelName, len(selDataset), sum(abundance))
+            selDataset2 = selDatasetTRAP.loc[selDatasetTRAP['class'].str.contains(labelName)]
+            abundanceTRAP = countAbundance(selDataset2, dateList2)
+            #print("TRAP classifier", trap, labelName, len(selDataset), sum(abundance))
     
+            selDataset1 = selDatasetGBIF.loc[selDatasetGBIF['class'].str.contains(labelName)]
+            abundanceGBIF = countAbundance(selDataset1, dateList1)
+            #print("GBIF classifier", trap, labelName, len(selDataset1a), sum(abundance1))
+            
             labelText = labelName #+ ' ' + str(countsTh*2) + 's'
             colorIdx = labelNamesPlot.index(labelName)
-            ax.plot(dayOfYear, abundance, label="Tracks", color=colors[colorIdx])
+            ax.plot(dayOfYear2, abundanceTRAP, label="Tracks (Trap)", linestyle='dashed', color=colors[colorIdx])
+            if plotGBIFClassifier:
+                ax.plot(dayOfYear1, abundanceGBIF, label="Tracks (GBIF)", color=colors[colorIdx])
             
             if useSnapImages:    
-                abundanceSnap = countSnapAbundance(predicted, dateList, labelName)
-                ax.plot(dayOfYear, abundanceSnap, label="TL", color="black")
-                correlation, _ = pearsonr(abundance, abundanceSnap)
+                abundanceSnap = countSnapAbundance(predicted, dateList1, labelName)
+                ax.plot(dayOfYear1, abundanceSnap, label="TL", color="black")
+                correlation, _ = pearsonr(abundanceGBIF, abundanceSnap)
                 correlation = np.round(correlation * 100)/100
                 title += r" ($\rho$=" + str(correlation) + ")"
       
             ax.set_title(title)
-            if useSnapImages and idxFig == 1:
-                ax.legend()  
+            if idxFig == 1:
+                ax.legend(loc="upper left")  
             if useSnapImages:
                 ax.set_yscale('log')
             if idxFig in [13, 14, 15]: 
                 ax.set_xlabel('Day of Year')
-            ax.set_xlim(dayOfYear[0], dayOfYear[-1]) # NB adjust for days operational
+            ax.set_xlim(dayOfYear1[0], dayOfYear1[-1]) # NB adjust for days operational
             if idxFig in [1, 4, 7, 10, 13]: 
                 if useSnapImages:
                     ax.set_ylabel('Observations')
@@ -417,14 +500,17 @@ if __name__ == '__main__':
     #plotAbundanceSelectedClasses(countsTh, percentageTh)
     
     traps = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3', 'SS4']
-    #traps = ['SS3', 'SS4']
+    #traps = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3']
+    #traps = ['OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3', 'SS4']
+    #traps = ['OH2']
     #analyseSnapFiles(traps)
     
     #traps = ['LV1']
     #for trap in traps:
     #    plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundance_moths_" + yearSelected + "/" + trap +"_Abundance") # Change year here!!!
 
-    plotYears = ["2022", "2023", "2024"]
+    #plotYears = ["2022", "2023", "2024"]
+    plotYears = ["2022"]
     for trap in traps:
         plotAbundanceAllYears(trap, plotYears, countsTh, percentageTh, "./abundance_moths_all_years/" + trap + "_")
     

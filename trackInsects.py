@@ -195,8 +195,12 @@ def trackInsects(imgPath, csvPath, trapName):
 def trackAllTraps(trapNames):
     
     for trapName in trapNames:
-        csvPath = './CSV/M2022S/' + trapName + '/'
-        imgPath = 'O:/Tech_TTH-KBE/MAVJF/data/2022/' + trapName + '/'
+        #csvPath = './CSV/M2022S/' + trapName + '/'
+        #imgPath = 'O:/Tech_TTH-KBE/MAVJF/data/2022/' + trapName + '/'
+        csvPath = './CSV/M2024S/' + trapName + '/'
+        imgPath = 'O:/Tech_TTH-KBE/MAVJF/data/2024/' + trapName + '/'
+        #csvPath = './CSV/M2023S/' + trapName + '/'
+        #imgPath = 'O:/Tech_TTH-KBE/MAVJF/data/2023/' + trapName + '/'
         #csvPath = './M2022S/' + trapName + '/'
         #imgPath = '/mnt/Dfs/Tech_TTH-KBE/MAVJF/data/2022/' + trapName + '/'
         trackInsects(imgPath, csvPath, trapName)
@@ -223,7 +227,7 @@ if __name__ == '__main__':
     print('  Videos and results (*TR.CSV) are saved in directory specified by moviemaker -> resultdir')
     print('  To enable creating video with bounding boxes and track lines set movimaker -> writemovie:true')
     parser = argparse.ArgumentParser()
-    parser.add_argument('--traps', default='single') # Process data from a 'single' trap or a list of 'multiple' traps
+    parser.add_argument('--traps', default='multiple') # Process data from a 'single' trap or a list of 'multiple' traps
     parser.add_argument('--species', default=True) # Use order/suborder classifer and moth species classifier if True (False only order/suborder)
     parser.add_argument('--date', default='20220618') # Set date for tracking - looking for <date>.csv file
     args = parser.parse_args()
@@ -234,7 +238,13 @@ if __name__ == '__main__':
     
     # Tracking of multiple traps with detections in CSV files for each day
     if args.traps == 'multiple':
-        trapNames = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3', 'SS4']
+        #trapNames = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3', 'SS4']
+        #trapNames = ['LV1', 'LV2', 'LV3', 'LV4']
+        #trapNames = ['OH1', 'OH2', 'OH3', 'OH4']
+        #trapNames = ['OH1', 'OH2', 'OH4']
+        #trapNames = ['LV3', 'LV4']
+        #trapNames = ['SS1', 'SS2', 'SS4']
+        trapNames = ['SS4', 'SS1']
         trackAllTraps(trapNames)
 
     # Tracking from a single trap with detections in CSV files for a specified day (args.date)
