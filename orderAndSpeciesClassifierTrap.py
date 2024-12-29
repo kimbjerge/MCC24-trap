@@ -59,7 +59,7 @@ class orderSpeciesClassifier:
         self.speciesSamples = data_species_thresholds["Samples"].to_list()
         
         num_species_classes=len(self.speciesLabels)
-        print("Species classifier uses ResNet50 and load weights with num. classes", num_classes)
+        print("Species classifier uses ResNet50 and load weights with num. classes", num_species_classes)
         
         self.speciesModel = ResNet50(num_classes=num_species_classes) 
         self.speciesModel.load_state_dict(torch.load(savedSpeciesWeights, map_location=device))
