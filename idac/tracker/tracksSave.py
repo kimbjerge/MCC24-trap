@@ -18,7 +18,7 @@ class TracksSave:
         # Iterate through each character in the input string
         for char in text_with_special_chars:
             # Check if the character is alphanumeric (letters or digits)
-            if char.isalnum() or char == ' ' or char == '.' or char == '&':
+            if char.isalnum() or char == ' ' or char == '.' or char == '&' or char == '-':
                 # If alphanumeric or a space, add it to the cleaned text
                 cleaned_text += char
             else:
