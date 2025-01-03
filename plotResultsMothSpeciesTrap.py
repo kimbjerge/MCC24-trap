@@ -31,7 +31,7 @@ labelNamesPlot = ["Araneae", "Coleoptera", "Diptera Brachycera", "Diptera Nemato
 #                  "Acherontia atropos", "Staurophora celsia", "Lomaspilis marginata", "Hyles", "Biston"]
 
 labelMothsPlot = ["Agrotis puta", "Amphipyra pyramidea", "Arctia caja", "Autographa gamma", "Biston",
-                  "Catocala", "Deltote pygarga", "Erannis defoliaria", "Hypomecis", "Lomaspilis marginata", 
+                  "Catocala", "Deltote pygarga", "Hypomecis", "Laothoe populi", "Lomaspilis marginata", 
                   "Noctua fimbriata", "Phalera bucephala", "Spilosoma lubricipeda", "Staurophora celsia", "Xestia"]
 
 config_filename = './ITC_config.json'
@@ -290,7 +290,7 @@ def plotMothSpecies(trap, mothSpecies, resultFileName, numSpecies, selectedYear=
     ax.set_title('Abundance of moth species ' + trap + ' ' + selectedYear)
     #ax.legend(title='Fruit color')
     plt.tight_layout(pad=2.0)
-    plt.savefig("./results/" + resultFileName + "LT" + selectedYear + ".png")
+    plt.savefig("./results_trap/" + resultFileName + "LT" + selectedYear + ".png")
     
     plt.show()
         
@@ -373,7 +373,7 @@ def plotAbundanceAllClasses(trap, countsTh, percentageTh, resultFileName, useSna
   
     plt.suptitle(subtitle)
     plt.tight_layout(pad=2.0)
-    plt.savefig("./results/" + resultFileName + ".png")
+    plt.savefig("./results_trap/" + resultFileName + ".png")
     plt.show() 
 
 def plotAbundanceAllYears(trap, selectedYears, countsTh, percentageTh, resultFileName, plotGBIFClassifier=True, useSnapImages=False):
@@ -383,8 +383,11 @@ def plotAbundanceAllYears(trap, selectedYears, countsTh, percentageTh, resultFil
     
     for selectedYear in selectedYears:
         
-        yearTrackPathGBIF = "C:/IHAK/MCC24-trap/tracks_" + selectedYear + "_moths/"
+        yearTrackPathGBIF = "./tracks_" + selectedYear + "_moths/"
         yearTrackPathTRAP = "./tracks_" + selectedYear + "_moths_trap/"
+        
+        dstCSVacc = "resultGBIFvsTrapAcc.csv"
+        dfAcc = pd.read_csv(dstCSVacc)
         
         dateList1, dayOfYear1, selDatasetGBIF = loadTrackFiles(trap, countsTh, percentageTh, trackPath=yearTrackPathGBIF)
         dateList2, dayOfYear2, selDatasetTRAP = loadTrackFiles(trap, countsTh, percentageTh, trackPath=yearTrackPathTRAP)
@@ -412,17 +415,23 @@ def plotAbundanceAllYears(trap, selectedYears, countsTh, percentageTh, resultFil
         idxFig = 1
         if firstYear == True:
             firstYear = False
-            #labelNamesPlot = mothSpeciesNames 
-            labelNamesPlot = labelMothsPlot # Use fixed selected species
+            labelNamesPlot = mothSpeciesNames 
+            #labelNamesPlot = labelMothsPlot # Use fixed selected species
             
         for labelName in labelNamesPlot:
-    
+            
             if "ax" in locals():
                 ax = figure.add_subplot(5, 3, idxFig, sharex = ax) #, sharey = ax) 
             else:
                 ax = figure.add_subplot(5, 3, idxFig) 
                  
-            title = labelName
+            dfAccSel = dfAcc.loc[dfAcc['Species'].str.contains(labelName)]
+            if len(dfAccSel) > 0:
+                titleExt = str(int(np.round(dfAccSel['GBIFAcc'].values[0]))) + '-' + str(int(np.round(dfAccSel['TrapAcc'].values[0]))) + '-' + str(dfAccSel['Support'].values[0])
+            else:
+                titleExt = '?'
+                
+            title = labelName + ' ' + titleExt
             colorIdx = 0
             if useSnapImages:
                 colors = ["green", "cyan",  "orange", 
@@ -481,7 +490,7 @@ def plotAbundanceAllYears(trap, selectedYears, countsTh, percentageTh, resultFil
       
         plt.suptitle(subtitle)
         plt.tight_layout(pad=2.0)
-        plt.savefig("./results/" + resultFileName + selectedYear + ".png")
+        plt.savefig("./results_trap/" + resultFileName + selectedYear + ".png")
         plt.show() 
 
 
@@ -502,15 +511,15 @@ if __name__ == '__main__':
     traps = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3', 'SS4']
     #traps = ['LV1', 'LV2', 'LV3', 'LV4', 'OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3']
     #traps = ['OH1', 'OH2', 'OH3', 'OH4', 'SS1', 'SS2', 'SS3', 'SS4']
-    #traps = ['OH2']
+    #traps = ['LV2', 'LV4']
     #analyseSnapFiles(traps)
     
     #traps = ['LV1']
     #for trap in traps:
     #    plotAbundanceAllClasses(trap, countsTh, percentageTh, "./abundance_moths_" + yearSelected + "/" + trap +"_Abundance") # Change year here!!!
 
-    #plotYears = ["2022", "2023", "2024"]
-    plotYears = ["2022"]
+    plotYears = ["2022", "2023", "2024"]
+    #plotYears = ["2022"]
     for trap in traps:
         plotAbundanceAllYears(trap, plotYears, countsTh, percentageTh, "./abundance_moths_all_years/" + trap + "_")
     
