@@ -393,9 +393,9 @@ def plotAbundanceAllYears(trap, selectedYears, countsTh, percentageTh, resultFil
         dateList2, dayOfYear2, selDatasetTRAP = loadTrackFiles(trap, countsTh, percentageTh, trackPath=yearTrackPathTRAP)
         
         # Select method to select species based on TRAP, GBIF or both classifiers
-        #mothSpecies, mothSpeciesNames = findMothSpecies(selDatasetTRAP, 15)
+        mothSpecies, mothSpeciesNames = findMothSpecies(selDatasetTRAP, 15)
         #mothSpecies, mothSpeciesNames = findMothSpecies(selDatasetGBIF, 15)
-        mothSpecies, mothSpeciesNames = findMothSpecies2(selDatasetGBIF, selDatasetTRAP, 15)
+        #mothSpecies, mothSpeciesNames = findMothSpecies2(selDatasetGBIF, selDatasetTRAP, 15)
         
         #plotMothSpecies(trap, mothSpecies, resultFileName, numSpecies=50, selectedYear=selectedYear)
       
@@ -415,8 +415,8 @@ def plotAbundanceAllYears(trap, selectedYears, countsTh, percentageTh, resultFil
         idxFig = 1
         if firstYear == True:
             firstYear = False
-            labelNamesPlot = mothSpeciesNames 
-            #labelNamesPlot = labelMothsPlot # Use fixed selected species
+            #labelNamesPlot = mothSpeciesNames 
+            labelNamesPlot = labelMothsPlot # Use fixed selected species
             
         for labelName in labelNamesPlot:
             
@@ -427,7 +427,7 @@ def plotAbundanceAllYears(trap, selectedYears, countsTh, percentageTh, resultFil
                  
             dfAccSel = dfAcc.loc[dfAcc['Species'].str.contains(labelName)]
             if len(dfAccSel) > 0:
-                titleExt = str(int(np.round(dfAccSel['GBIFAcc'].values[0]))) + '-' + str(int(np.round(dfAccSel['TrapAcc'].values[0]))) + '-' + str(dfAccSel['Support'].values[0])
+                titleExt = str(int(np.round(np.mean(dfAccSel['GBIFAcc'].values)))) + '-' + str(int(np.round(np.mean(dfAccSel['TrapAcc'].values)))) + '-' + str(np.sum(dfAccSel['Support'].values))
             else:
                 titleExt = '?'
                 
@@ -521,5 +521,5 @@ if __name__ == '__main__':
     plotYears = ["2022", "2023", "2024"]
     #plotYears = ["2022"]
     for trap in traps:
-        plotAbundanceAllYears(trap, plotYears, countsTh, percentageTh, "./abundance_moths_all_years/" + trap + "_")
+        plotAbundanceAllYears(trap, plotYears, countsTh, percentageTh, "./abundance_moths_all_years_selected2/" + trap + "_")
     
