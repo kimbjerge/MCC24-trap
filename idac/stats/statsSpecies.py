@@ -131,9 +131,10 @@ class Stats:
             if counts == 0: 
                 counts = 1
             if obj.label == 'unknown':
-                conf = (self.idhistory[obj.id][1][ind]*2) / counts
-            elif counts > 0:
-                conf = self.idhistory[obj.id][1][ind] / counts
+                conf = (self.idhistory[obj.id][1][ind]*2) / (counts + 1)
+            #elif counts > 0:
+            else:
+                conf = self.idhistory[obj.id][1][ind] / (counts + 1)
 
             #Distance
             distance = obj.distance
