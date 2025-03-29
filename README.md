@@ -1,6 +1,9 @@
 # MCC24-trap #
 This project contains Python code for processing time-lapse and motion images from the AMI traps (detection, classification and tracking)
-The repository contains Python code for steps 1-4 in figure below. (The three datasets are not included only the trained models and weights)
+The repository contains Python code for steps 1-4 in figure below. 
+
+The datasets used for training the nocturnal insect detector and broad taxon classifier can be found on Zenodo:
+https://zenodo.org/records/15105293
 
 The work and results are described in the paper: "Towards edge processing of images from insect camera traps"
 https://www.biorxiv.org/content/10.1101/2024.07.01.601488v2
