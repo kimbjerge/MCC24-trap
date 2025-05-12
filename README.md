@@ -6,7 +6,8 @@ The datasets used for training the nocturnal insect detector and broad taxon cla
 https://zenodo.org/records/15105293
 
 The work and results are described in the paper: "Towards edge processing of images from insect camera traps"
-https://www.biorxiv.org/content/10.1101/2024.07.01.601488v2
+https://www.biorxiv.org/content/10.1101/2024.07.01.601488v2 (Preprint)
+https://zslpublications.onlinelibrary.wiley.com/doi/full/10.1002/rse2.70007 (Published 17. April 2025)
 
 
 ![Alt text](EdgeProcessingNocturalInsectsTaxon.png)
