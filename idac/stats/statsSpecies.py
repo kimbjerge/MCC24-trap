@@ -58,6 +58,11 @@ class Stats:
             else:
                 # New idhistory = [number of detections, index array of species, name of classification]
                 self.idhistory[obj.id] = [1, np.zeros(len(self.species)), '']
+                
+                #KBE corrected counting number of detections in track
+                index = self.species.index(obj.label)                      
+                self.idhistory[obj.id][1][index] += 1
+
                 obj.starttime = time
                 obj.endtime = time
                 obj.startdate = startdate
