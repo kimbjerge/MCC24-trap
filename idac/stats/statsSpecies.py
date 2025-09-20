@@ -136,10 +136,10 @@ class Stats:
             if counts == 0: 
                 counts = 1
             if obj.label == 'unknown':
-                conf = (self.idhistory[obj.id][1][ind]*2) / (counts + 1)
+                conf = (self.idhistory[obj.id][1][ind]*2) / counts
             #elif counts > 0:
             else:
-                conf = self.idhistory[obj.id][1][ind] / (counts + 1)
+                conf = self.idhistory[obj.id][1][ind] / counts
 
             #Distance
             distance = obj.distance
@@ -165,12 +165,12 @@ class Stats:
                     
                 towrite = '{\"id\":' + str(obj.id) + ','  + '\"startdate\":' + obj.startdate + ',' + '\"starttime\":\"' + obj.starttime + '\",' + '\"endtime\":\"' + obj.endtime + '\",' \
                           + '\"duration\":' + str(int(tdelta_seconds)) + ',' + '\"class\":' + '\"' + self.cleanText(obj.label) + '\",' \
-                          + '\"counts\":' + str(int(obj.counts)) + ',' + '\"percentage\":' + "%0.2f" % (conf*100) + ',' + '\"size\":' \
+                          + '\"counts\":' + str(int(obj.counts-1)) + ',' + '\"percentage\":' + "%0.2f" % (conf*100) + ',' + '\"size\":' \
                           + "%0.2f" % avg_blob + ',' + '\"distance\":' + str(int(distance)) + '}'
                 file.write(towrite)
                 
                 line = str(obj.id) + ',' + obj.startdate + ',' + obj.starttime + ',' + obj.endtime + ',' + str(int(tdelta_seconds)) + ',' \
-                       + self.cleanText(obj.label) + ',' + str(int(obj.counts)) + ',' + "%0.2f" % (conf*100) + ','  + "%0.2f" % avg_blob + ',' + str(int(distance)) + '\n'
+                       + self.cleanText(obj.label) + ',' + str(int(obj.counts-1)) + ',' + "%0.2f" % (conf*100) + ','  + "%0.2f" % avg_blob + ',' + str(int(distance)) + '\n'
                 filecsv.write(line)
 
         line = ']\n}\n'

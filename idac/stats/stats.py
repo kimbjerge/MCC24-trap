@@ -126,12 +126,12 @@ class Stats:
                     
                 towrite = '{\"id\":' + str(obj.id) + ','  + '\"startdate\":' + obj.startdate + ',' + '\"starttime\":\"' + obj.starttime + '\",' + '\"endtime\":\"' + obj.endtime + '\",' \
                           + '\"duration\":' + str(int(tdelta_seconds)) + ',' + '\"class\":' + '\"' + obj.label + '\",' \
-                          + '\"counts\":' + str(int(obj.counts)) + ',' + '\"percentage\":' + "%0.2f" % (conf*100) + ',' + '\"size\":' \
+                          + '\"counts\":' + str(int(obj.counts-1)) + ',' + '\"percentage\":' + "%0.2f" % (conf*100) + ',' + '\"size\":' \
                           + "%0.2f" % avg_blob + ',' + '\"distance\":' + str(int(distance)) + '}'
                 file.write(towrite)
                 
                 line = str(obj.id) + ',' + obj.startdate + ',' + obj.starttime + ',' + obj.endtime + ',' + str(int(tdelta_seconds)) + ',' \
-                       + obj.label + ',' + str(int(obj.counts)) + ',' + "%0.2f" % (conf*100) + ','  + "%0.2f" % avg_blob + ',' + str(int(distance)) + '\n'
+                       + obj.label + ',' + str(int(obj.counts-1)) + ',' + "%0.2f" % (conf*100) + ','  + "%0.2f" % avg_blob + ',' + str(int(distance)) + '\n'
                 filecsv.write(line)
 
         line = ']\n}\n'
