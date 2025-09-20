@@ -157,7 +157,7 @@ class Stats:
             avg_blob = np.mean(obj.boxsizehist)
 
             #Format string
-            if obj.counts >= self.mincounts: #JBN??? 4 should be same threshold as for statistic
+            if (obj.counts-1) >= self.mincounts: #JBN??? 4 should be same threshold as for statistic
                 if firstLine:
                     firstLine=False
                 else:
